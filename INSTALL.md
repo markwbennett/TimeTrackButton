@@ -4,13 +4,13 @@
 
 ### Option 1: Install from this repository
 ```bash
-brew install --formula ./Formula/iacls-time-tracker.rb
+brew install --cask ./Casks/iacls-time-tracker.rb
 ```
 
 ### Option 2: Add as a tap (for easier updates)
 ```bash
 brew tap markwbennett/timetracker https://github.com/markwbennett/TimeTrackButton
-brew install iacls-time-tracker
+brew install --cask iacls-time-tracker
 ```
 
 ## Manual Installation
