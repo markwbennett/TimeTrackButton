@@ -37,6 +37,12 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollArea>
 #include <QtGui/QAction>
+#include <QtWidgets/QSlider>
+#include <QtWidgets/QListWidget>
+#include <QtWidgets/QTabWidget>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QInputDialog>
 
 class StateManager {
 public:
@@ -1019,6 +1025,258 @@ public:
     }
 };
 
+class PreferencesDialog : public QDialog {
+public:
+    explicit PreferencesDialog(QWidget* parent = nullptr) : QDialog(parent) {
+        setWindowTitle("Preferences");
+        setModal(true);
+        setFixedSize(500, 400);
+        
+        auto* layout = new QVBoxLayout(this);
+        auto* tabs = new QTabWidget(this);
+        
+        // Audio tab
+        auto* audioTab = new QWidget();
+        auto* audioLayout = new QVBoxLayout(audioTab);
+        
+        auto* volumeGroup = new QGroupBox("Chime Volume", audioTab);
+        auto* volumeLayout = new QVBoxLayout(volumeGroup);
+        
+        volumeSlider = new QSlider(Qt::Horizontal, volumeGroup);
+        volumeSlider->setRange(0, 100);
+        volumeSlider->setValue(loadChimeVolume());
+        
+        auto* volumeLabel = new QLabel(QString("Volume: %1%").arg(volumeSlider->value()), volumeGroup);
+        connect(volumeSlider, &QSlider::valueChanged, [volumeLabel](int value) {
+            volumeLabel->setText(QString("Volume: %1%").arg(value));
+        });
+        
+        volumeLayout->addWidget(volumeLabel);
+        volumeLayout->addWidget(volumeSlider);
+        audioLayout->addWidget(volumeGroup);
+        audioLayout->addStretch();
+        
+        tabs->addTab(audioTab, "Audio");
+        
+        // Projects tab
+        auto* projectsTab = new QWidget();
+        auto* projectsLayout = new QVBoxLayout(projectsTab);
+        
+        auto* projectsGroup = new QGroupBox("Projects", projectsTab);
+        auto* projectsGroupLayout = new QVBoxLayout(projectsGroup);
+        
+        projectsList = new QListWidget(projectsGroup);
+        projectsList->setDragDropMode(QAbstractItemView::InternalMove);
+        loadProjects();
+        
+        auto* projectsButtonLayout = new QHBoxLayout();
+        auto* addProjectBtn = new QPushButton("Add", projectsGroup);
+        auto* editProjectBtn = new QPushButton("Edit", projectsGroup);
+        auto* deleteProjectBtn = new QPushButton("Delete", projectsGroup);
+        
+        connect(addProjectBtn, &QPushButton::clicked, this, &PreferencesDialog::addProject);
+        connect(editProjectBtn, &QPushButton::clicked, this, &PreferencesDialog::editProject);
+        connect(deleteProjectBtn, &QPushButton::clicked, this, &PreferencesDialog::deleteProject);
+        
+        projectsButtonLayout->addWidget(addProjectBtn);
+        projectsButtonLayout->addWidget(editProjectBtn);
+        projectsButtonLayout->addWidget(deleteProjectBtn);
+        projectsButtonLayout->addStretch();
+        
+        projectsGroupLayout->addWidget(projectsList);
+        projectsGroupLayout->addLayout(projectsButtonLayout);
+        projectsLayout->addWidget(projectsGroup);
+        
+        tabs->addTab(projectsTab, "Projects");
+        
+        // Activities tab
+        auto* activitiesTab = new QWidget();
+        auto* activitiesLayout = new QVBoxLayout(activitiesTab);
+        
+        auto* activitiesGroup = new QGroupBox("Activities", activitiesTab);
+        auto* activitiesGroupLayout = new QVBoxLayout(activitiesGroup);
+        
+        activitiesList = new QListWidget(activitiesGroup);
+        activitiesList->setDragDropMode(QAbstractItemView::InternalMove);
+        loadActivities();
+        
+        auto* activitiesButtonLayout = new QHBoxLayout();
+        auto* addActivityBtn = new QPushButton("Add", activitiesGroup);
+        auto* editActivityBtn = new QPushButton("Edit", activitiesGroup);
+        auto* deleteActivityBtn = new QPushButton("Delete", activitiesGroup);
+        
+        connect(addActivityBtn, &QPushButton::clicked, this, &PreferencesDialog::addActivity);
+        connect(editActivityBtn, &QPushButton::clicked, this, &PreferencesDialog::editActivity);
+        connect(deleteActivityBtn, &QPushButton::clicked, this, &PreferencesDialog::deleteActivity);
+        
+        activitiesButtonLayout->addWidget(addActivityBtn);
+        activitiesButtonLayout->addWidget(editActivityBtn);
+        activitiesButtonLayout->addWidget(deleteActivityBtn);
+        activitiesButtonLayout->addStretch();
+        
+        activitiesGroupLayout->addWidget(activitiesList);
+        activitiesGroupLayout->addLayout(activitiesButtonLayout);
+        activitiesLayout->addWidget(activitiesGroup);
+        
+        tabs->addTab(activitiesTab, "Activities");
+        
+        layout->addWidget(tabs);
+        
+        // Dialog buttons
+        auto* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
+        connect(buttonBox, &QDialogButtonBox::accepted, this, &PreferencesDialog::saveAndAccept);
+        connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+        layout->addWidget(buttonBox);
+    }
+
+private slots:
+    void saveAndAccept() {
+        saveChimeVolume(volumeSlider->value());
+        saveProjects();
+        saveActivities();
+        accept();
+    }
+    
+    void addProject() {
+        bool ok;
+        QString text = QInputDialog::getText(this, "Add Project", "Project name:", QLineEdit::Normal, "", &ok);
+        if (ok && !text.isEmpty()) {
+            projectsList->addItem(text);
+        }
+    }
+    
+    void editProject() {
+        auto* item = projectsList->currentItem();
+        if (item) {
+            bool ok;
+            QString text = QInputDialog::getText(this, "Edit Project", "Project name:", QLineEdit::Normal, item->text(), &ok);
+            if (ok && !text.isEmpty()) {
+                item->setText(text);
+            }
+        }
+    }
+    
+    void deleteProject() {
+        auto* item = projectsList->currentItem();
+        if (item) {
+            delete projectsList->takeItem(projectsList->row(item));
+        }
+    }
+    
+    void addActivity() {
+        bool ok;
+        QString text = QInputDialog::getText(this, "Add Activity", "Activity name:", QLineEdit::Normal, "", &ok);
+        if (ok && !text.isEmpty()) {
+            activitiesList->addItem(text);
+        }
+    }
+    
+    void editActivity() {
+        auto* item = activitiesList->currentItem();
+        if (item) {
+            bool ok;
+            QString text = QInputDialog::getText(this, "Edit Activity", "Activity name:", QLineEdit::Normal, item->text(), &ok);
+            if (ok && !text.isEmpty()) {
+                item->setText(text);
+            }
+        }
+    }
+    
+    void deleteActivity() {
+        auto* item = activitiesList->currentItem();
+        if (item) {
+            delete activitiesList->takeItem(activitiesList->row(item));
+        }
+    }
+    
+    void loadProjects() {
+        QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/projects";
+        QFile file(configFile);
+        if (file.exists() && file.open(QIODevice::ReadOnly)) {
+            QTextStream in(&file);
+            while (!in.atEnd()) {
+                QString line = in.readLine().trimmed();
+                if (!line.isEmpty()) {
+                    projectsList->addItem(line);
+                }
+            }
+        }
+    }
+    
+    void saveProjects() {
+        QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/projects";
+        QFileInfo configInfo(configFile);
+        QDir().mkpath(configInfo.absolutePath());
+        
+        QFile file(configFile);
+        if (file.open(QIODevice::WriteOnly)) {
+            QTextStream out(&file);
+            for (int i = 0; i < projectsList->count(); ++i) {
+                out << projectsList->item(i)->text() << "\n";
+            }
+        }
+    }
+    
+    void loadActivities() {
+        QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/activities";
+        QFile file(configFile);
+        if (file.exists() && file.open(QIODevice::ReadOnly)) {
+            QTextStream in(&file);
+            while (!in.atEnd()) {
+                QString line = in.readLine().trimmed();
+                if (!line.isEmpty()) {
+                    activitiesList->addItem(line);
+                }
+            }
+        } else {
+            // Default activities
+            QStringList defaults = {"Research", "Writing", "Meeting", "Review", "Admin", "Other"};
+            for (const QString& activity : defaults) {
+                activitiesList->addItem(activity);
+            }
+        }
+    }
+    
+    void saveActivities() {
+        QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/activities";
+        QFileInfo configInfo(configFile);
+        QDir().mkpath(configInfo.absolutePath());
+        
+        QFile file(configFile);
+        if (file.open(QIODevice::WriteOnly)) {
+            QTextStream out(&file);
+            for (int i = 0; i < activitiesList->count(); ++i) {
+                out << activitiesList->item(i)->text() << "\n";
+            }
+        }
+    }
+    
+    int loadChimeVolume() {
+        QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/volume";
+        QFile file(configFile);
+        if (file.exists() && file.open(QIODevice::ReadOnly)) {
+            return file.readAll().trimmed().toInt();
+        }
+        return 100; // Default volume
+    }
+    
+    void saveChimeVolume(int volume) {
+        QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/volume";
+        QFileInfo configInfo(configFile);
+        QDir().mkpath(configInfo.absolutePath());
+        
+        QFile file(configFile);
+        if (file.open(QIODevice::WriteOnly)) {
+            file.write(QString::number(volume).toUtf8());
+        }
+    }
+
+private:
+    QSlider* volumeSlider;
+    QListWidget* projectsList;
+    QListWidget* activitiesList;
+};
+
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     app.setQuitOnLastWindowClosed(false);
@@ -1030,11 +1288,21 @@ int main(int argc, char *argv[]) {
     // Create menu bar and add About action
     QMenuBar* menuBar = new QMenuBar();
     QMenu* appMenu = menuBar->addMenu("TimeTracker");
+    
     QAction* aboutAction = new QAction("About IACLS Time Tracker", &app);
     appMenu->addAction(aboutAction);
     QObject::connect(aboutAction, &QAction::triggered, [&]() {
         AboutDialog aboutDialog;
         aboutDialog.exec();
+    });
+    
+    appMenu->addSeparator();
+    
+    QAction* preferencesAction = new QAction("Preferences...", &app);
+    appMenu->addAction(preferencesAction);
+    QObject::connect(preferencesAction, &QAction::triggered, [&]() {
+        PreferencesDialog preferencesDialog;
+        preferencesDialog.exec();
     });
 
     DraggableHandle handle;
