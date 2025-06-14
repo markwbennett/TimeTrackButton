@@ -14,17 +14,22 @@ chmod +x install.sh
 ./install.sh
 ```
 
-## Homebrew Installation
+## Homebrew Installation (Recommended)
 
-### Option 1: Install from this repository
+### Option 1: Install from Homebrew tap
 ```bash
-brew install --cask ./Casks/iacls-time-tracker.rb
+brew tap markwbennett/timetrackbutton
+brew install --cask iacls-time-tracker
 ```
 
-### Option 2: Add as a tap (for easier updates)
+### Option 2: Direct install from tap
 ```bash
-brew tap markwbennett/timetracker https://github.com/markwbennett/TimeTrackButton
-brew install --cask iacls-time-tracker
+brew install --cask markwbennett/timetrackbutton/iacls-time-tracker
+```
+
+### Option 3: Install from local repository
+```bash
+brew install --cask ./Casks/iacls-time-tracker.rb
 ```
 
 **Note**: The Homebrew Cask automatically removes quarantine attributes to prevent "damaged app" warnings.
