@@ -54,6 +54,23 @@ open TimeTracker_CPP.app
 - Qt6 (auto-installed via Homebrew)
 - CMake (auto-installed via Homebrew)
 
+## Installation
+
+### Homebrew (Recommended)
+```bash
+brew tap markwbennett/timetrackbutton
+brew install --cask iacls-time-tracker
+```
+
+### Manual Build
+```bash
+cd cpp_app
+./build_cpp.sh
+open TimeTracker_CPP.app
+```
+
+For complete installation options, see [INSTALL.md](INSTALL.md).
+
 ## License
 
 See `documentation/LICENSE` 
