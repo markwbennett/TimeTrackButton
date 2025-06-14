@@ -32,6 +32,11 @@
 #include <cmath>
 #include <unistd.h>
 #include <fcntl.h>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QScrollArea>
+#include <QtGui/QAction>
 
 class StateManager {
 public:
@@ -296,6 +301,67 @@ private:
     QLineEdit* customInput;
 };
 
+class AboutDialog : public QDialog {
+public:
+    explicit AboutDialog(QWidget* parent = nullptr) : QDialog(parent) {
+        setWindowTitle("About IACLS Time Tracker");
+        setModal(true);
+        setFixedSize(450, 350);
+        
+        auto* mainLayout = new QVBoxLayout(this);
+        
+        // Create scroll area
+        auto* scrollArea = new QScrollArea(this);
+        scrollArea->setWidgetResizable(true);
+        scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        
+        // Create content widget
+        auto* contentWidget = new QWidget();
+        auto* layout = new QVBoxLayout(contentWidget);
+        layout->setSpacing(15);
+        
+        // App title and version
+        auto* titleLabel = new QLabel("<h2>IACLS Time Tracker</h2>", contentWidget);
+        titleLabel->setAlignment(Qt::AlignCenter);
+        layout->addWidget(titleLabel);
+        
+        // Description
+        auto* descLabel = new QLabel(
+            "<p>A lightweight time tracking application designed for legal professionals "
+            "and researchers. Features include:</p>"
+            "<ul>"
+            "<li>Floating button interface with visual status</li>"
+            "<li>Project and activity tracking</li>"
+            "<li>Audio chimes every 6 minutes</li>"
+            "<li>Automatic CSV export</li>"
+            "<li>Multi-instance synchronization</li>"
+            "</ul>", contentWidget);
+        descLabel->setWordWrap(true);
+        layout->addWidget(descLabel);
+        
+        // Donation request
+        auto* donationLabel = new QLabel(
+            "<p><b>If you find this application useful, please consider supporting "
+            "the Institute for Advanced Criminal Law Studies:</b></p>"
+            "<p><a href=\"https://www.iacls.org/donate\">https://www.iacls.org/donate</a></p>"
+            "<p>Your contribution helps advance criminal law research and education.</p>", contentWidget);
+        donationLabel->setWordWrap(true);
+        donationLabel->setOpenExternalLinks(true);
+        donationLabel->setStyleSheet("QLabel { color: #0066cc; }");
+        layout->addWidget(donationLabel);
+        
+        // Set content widget to scroll area
+        scrollArea->setWidget(contentWidget);
+        mainLayout->addWidget(scrollArea);
+        
+        // Close button
+        auto* closeBtn = new QPushButton("Close", this);
+        connect(closeBtn, &QPushButton::clicked, this, &QDialog::accept);
+        mainLayout->addWidget(closeBtn);
+    }
+};
+
 class TrackingMenuDialog : public QDialog {
 public:
     explicit TrackingMenuDialog(QWidget* parent = nullptr) : QDialog(parent) {
@@ -347,11 +413,7 @@ public:
         setupDatabase();
         setupSound();
         
-        // Load initial state from database/state file
-        syncState();
-        updateAppearance();
-        
-        // Setup timers
+        // Setup timers FIRST before calling syncState
         chimeTimer = new QTimer(this);
         connect(chimeTimer, &QTimer::timeout, [this]() { checkChimeTime(); });
         chimeTimer->setInterval(1000);
@@ -359,11 +421,17 @@ public:
         // State sync timer - check for external changes every 2 seconds
         syncTimer = new QTimer(this);
         connect(syncTimer, &QTimer::timeout, [this]() { syncState(); });
-        syncTimer->start(2000);
         
         // Display update timer - update time display every second when tracking
         displayTimer = new QTimer(this);
         connect(displayTimer, &QTimer::timeout, [this]() { updateAppearance(); });
+        
+        // Load initial state from database/state file AFTER timers are initialized
+        syncState();
+        updateAppearance();
+        
+        // Start the recurring timers
+        syncTimer->start(2000);
         displayTimer->start(1000);
     }
 
@@ -1000,6 +1068,20 @@ int main(int argc, char *argv[]) {
     // Set application properties for QSettings
     app.setOrganizationName("IACLS");
     app.setApplicationName("TimeTracker");
+    
+    // Create menu bar and add About action
+    QMenuBar* menuBar = new QMenuBar();
+    QMenu* appMenu = menuBar->addMenu("TimeTracker");
+    
+    QAction* aboutAction = new QAction("About IACLS Time Tracker", &app);
+    appMenu->addAction(aboutAction);
+    
+    // Connect About action to show dialog
+    QObject::connect(aboutAction, &QAction::triggered, [&]() {
+        AboutDialog* aboutDialog = new AboutDialog();
+        aboutDialog->exec();
+        aboutDialog->deleteLater();
+    });
     
     DraggableHandle handle;
     handle.show();
