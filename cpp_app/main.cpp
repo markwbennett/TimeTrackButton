@@ -1190,7 +1190,8 @@ private slots:
     }
     
     void loadProjects() {
-        QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/projects";
+        QString dataDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/TimeTracker";
+        QString configFile = dataDir + "/.config/projects";
         QFile file(configFile);
         if (file.exists() && file.open(QIODevice::ReadOnly)) {
             QTextStream in(&file);
@@ -1204,7 +1205,8 @@ private slots:
     }
     
     void saveProjects() {
-        QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/projects";
+        QString dataDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/TimeTracker";
+        QString configFile = dataDir + "/.config/projects";
         QFileInfo configInfo(configFile);
         QDir().mkpath(configInfo.absolutePath());
         
@@ -1218,7 +1220,8 @@ private slots:
     }
     
     void loadActivities() {
-        QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/activities";
+        QString dataDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/TimeTracker";
+        QString configFile = dataDir + "/.config/activities";
         QFile file(configFile);
         if (file.exists() && file.open(QIODevice::ReadOnly)) {
             QTextStream in(&file);
@@ -1238,7 +1241,8 @@ private slots:
     }
     
     void saveActivities() {
-        QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/activities";
+        QString dataDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/TimeTracker";
+        QString configFile = dataDir + "/.config/activities";
         QFileInfo configInfo(configFile);
         QDir().mkpath(configInfo.absolutePath());
         
