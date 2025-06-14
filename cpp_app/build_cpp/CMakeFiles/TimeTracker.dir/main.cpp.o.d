@@ -1335,4 +1335,9 @@ CMakeFiles/TimeTracker.dir/main.cpp.o: \
   /opt/homebrew/opt/qt/include/QtWidgets/QSpinBox \
   /opt/homebrew/opt/qt/include/QtWidgets/qspinbox.h \
   /opt/homebrew/opt/qt/include/QtWidgets/QInputDialog \
-  /opt/homebrew/opt/qt/include/QtWidgets/qinputdialog.h
+  /opt/homebrew/opt/qt/include/QtWidgets/qinputdialog.h \
+  /Users/markbennett/github/TimeTrackButton/cpp_app/build_cpp/TimeTracker_autogen/include/main.moc \
+  /opt/homebrew/opt/qt/include/QtCore/qtmochelpers.h \
+  /opt/homebrew/opt/qt/include/QtCore/qtmocconstants.h \
+  /opt/homebrew/opt/qt/include/QtCore/q20algorithm.h \
+  /opt/homebrew/opt/qt/include/QtCore/q23type_traits.h

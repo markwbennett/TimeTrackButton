@@ -1,0 +1,325 @@
+/****************************************************************************
+** Meta object code from reading C++ file 'main.cpp'
+**
+** Created by: The Qt Meta Object Compiler version 69 (Qt 6.9.0)
+**
+** WARNING! All changes made in this file will be lost!
+*****************************************************************************/
+
+#include <QtCore/qmetatype.h>
+
+#include <QtCore/qtmochelpers.h>
+
+#include <memory>
+
+
+#include <QtCore/qxptype_traits.h>
+#if !defined(Q_MOC_OUTPUT_REVISION)
+#error "The header file 'main.cpp' doesn't include <QObject>."
+#elif Q_MOC_OUTPUT_REVISION != 69
+#error "This file was generated using the moc from 6.9.0. It"
+#error "cannot be used with the include files from this version of Qt."
+#error "(The moc has changed too much.)"
+#endif
+
+#ifndef Q_CONSTINIT
+#define Q_CONSTINIT
+#endif
+
+QT_WARNING_PUSH
+QT_WARNING_DISABLE_DEPRECATED
+QT_WARNING_DISABLE_GCC("-Wuseless-cast")
+namespace {
+struct qt_meta_tag_ZN14FloatingButtonE_t {};
+} // unnamed namespace
+
+template <> constexpr inline auto FloatingButton::qt_create_metaobjectdata<qt_meta_tag_ZN14FloatingButtonE_t>()
+{
+    namespace QMC = QtMocConstants;
+    QtMocHelpers::StringRefStorage qt_stringData {
+        "FloatingButton",
+        "buttonSizeChanged",
+        "",
+        "newSize"
+    };
+
+    QtMocHelpers::UintData qt_methods {
+        // Signal 'buttonSizeChanged'
+        QtMocHelpers::SignalData<void(int)>(1, 2, QMC::AccessPublic, QMetaType::Void, {{
+            { QMetaType::Int, 3 },
+        }}),
+    };
+    QtMocHelpers::UintData qt_properties {
+    };
+    QtMocHelpers::UintData qt_enums {
+    };
+    return QtMocHelpers::metaObjectData<FloatingButton, qt_meta_tag_ZN14FloatingButtonE_t>(QMC::MetaObjectFlag{}, qt_stringData,
+            qt_methods, qt_properties, qt_enums);
+}
+Q_CONSTINIT const QMetaObject FloatingButton::staticMetaObject = { {
+    QMetaObject::SuperData::link<QPushButton::staticMetaObject>(),
+    qt_staticMetaObjectStaticContent<qt_meta_tag_ZN14FloatingButtonE_t>.stringdata,
+    qt_staticMetaObjectStaticContent<qt_meta_tag_ZN14FloatingButtonE_t>.data,
+    qt_static_metacall,
+    nullptr,
+    qt_staticMetaObjectRelocatingContent<qt_meta_tag_ZN14FloatingButtonE_t>.metaTypes,
+    nullptr
+} };
+
+void FloatingButton::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    auto *_t = static_cast<FloatingButton *>(_o);
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: _t->buttonSizeChanged((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        default: ;
+        }
+    }
+    if (_c == QMetaObject::IndexOfMethod) {
+        if (QtMocHelpers::indexOfMethod<void (FloatingButton::*)(int )>(_a, &FloatingButton::buttonSizeChanged, 0))
+            return;
+    }
+}
+
+const QMetaObject *FloatingButton::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *FloatingButton::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_staticMetaObjectStaticContent<qt_meta_tag_ZN14FloatingButtonE_t>.strings))
+        return static_cast<void*>(this);
+    return QPushButton::qt_metacast(_clname);
+}
+
+int FloatingButton::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QPushButton::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 1)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 1;
+    }
+    if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 1)
+            *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
+        _id -= 1;
+    }
+    return _id;
+}
+
+// SIGNAL 0
+void FloatingButton::buttonSizeChanged(int _t1)
+{
+    QMetaObject::activate<void>(this, &staticMetaObject, 0, nullptr, _t1);
+}
+namespace {
+struct qt_meta_tag_ZN15DraggableHandleE_t {};
+} // unnamed namespace
+
+template <> constexpr inline auto DraggableHandle::qt_create_metaobjectdata<qt_meta_tag_ZN15DraggableHandleE_t>()
+{
+    namespace QMC = QtMocConstants;
+    QtMocHelpers::StringRefStorage qt_stringData {
+        "DraggableHandle",
+        "updateContainerSize",
+        "",
+        "buttonSize"
+    };
+
+    QtMocHelpers::UintData qt_methods {
+        // Slot 'updateContainerSize'
+        QtMocHelpers::SlotData<void(int)>(1, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::Int, 3 },
+        }}),
+    };
+    QtMocHelpers::UintData qt_properties {
+    };
+    QtMocHelpers::UintData qt_enums {
+    };
+    return QtMocHelpers::metaObjectData<DraggableHandle, qt_meta_tag_ZN15DraggableHandleE_t>(QMC::MetaObjectFlag{}, qt_stringData,
+            qt_methods, qt_properties, qt_enums);
+}
+Q_CONSTINIT const QMetaObject DraggableHandle::staticMetaObject = { {
+    QMetaObject::SuperData::link<QWidget::staticMetaObject>(),
+    qt_staticMetaObjectStaticContent<qt_meta_tag_ZN15DraggableHandleE_t>.stringdata,
+    qt_staticMetaObjectStaticContent<qt_meta_tag_ZN15DraggableHandleE_t>.data,
+    qt_static_metacall,
+    nullptr,
+    qt_staticMetaObjectRelocatingContent<qt_meta_tag_ZN15DraggableHandleE_t>.metaTypes,
+    nullptr
+} };
+
+void DraggableHandle::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    auto *_t = static_cast<DraggableHandle *>(_o);
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: _t->updateContainerSize((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        default: ;
+        }
+    }
+}
+
+const QMetaObject *DraggableHandle::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *DraggableHandle::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_staticMetaObjectStaticContent<qt_meta_tag_ZN15DraggableHandleE_t>.strings))
+        return static_cast<void*>(this);
+    return QWidget::qt_metacast(_clname);
+}
+
+int DraggableHandle::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QWidget::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 1)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 1;
+    }
+    if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 1)
+            *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
+        _id -= 1;
+    }
+    return _id;
+}
+namespace {
+struct qt_meta_tag_ZN17PreferencesDialogE_t {};
+} // unnamed namespace
+
+template <> constexpr inline auto PreferencesDialog::qt_create_metaobjectdata<qt_meta_tag_ZN17PreferencesDialogE_t>()
+{
+    namespace QMC = QtMocConstants;
+    QtMocHelpers::StringRefStorage qt_stringData {
+        "PreferencesDialog",
+        "saveAndAccept",
+        "",
+        "addProject",
+        "editProject",
+        "deleteProject",
+        "addActivity",
+        "editActivity",
+        "deleteActivity",
+        "loadProjects",
+        "saveProjects",
+        "loadActivities",
+        "saveActivities",
+        "loadChimeVolume",
+        "saveChimeVolume",
+        "volume"
+    };
+
+    QtMocHelpers::UintData qt_methods {
+        // Slot 'saveAndAccept'
+        QtMocHelpers::SlotData<void()>(1, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'addProject'
+        QtMocHelpers::SlotData<void()>(3, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'editProject'
+        QtMocHelpers::SlotData<void()>(4, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'deleteProject'
+        QtMocHelpers::SlotData<void()>(5, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'addActivity'
+        QtMocHelpers::SlotData<void()>(6, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'editActivity'
+        QtMocHelpers::SlotData<void()>(7, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'deleteActivity'
+        QtMocHelpers::SlotData<void()>(8, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'loadProjects'
+        QtMocHelpers::SlotData<void()>(9, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'saveProjects'
+        QtMocHelpers::SlotData<void()>(10, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'loadActivities'
+        QtMocHelpers::SlotData<void()>(11, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'saveActivities'
+        QtMocHelpers::SlotData<void()>(12, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'loadChimeVolume'
+        QtMocHelpers::SlotData<int()>(13, 2, QMC::AccessPrivate, QMetaType::Int),
+        // Slot 'saveChimeVolume'
+        QtMocHelpers::SlotData<void(int)>(14, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::Int, 15 },
+        }}),
+    };
+    QtMocHelpers::UintData qt_properties {
+    };
+    QtMocHelpers::UintData qt_enums {
+    };
+    return QtMocHelpers::metaObjectData<PreferencesDialog, qt_meta_tag_ZN17PreferencesDialogE_t>(QMC::MetaObjectFlag{}, qt_stringData,
+            qt_methods, qt_properties, qt_enums);
+}
+Q_CONSTINIT const QMetaObject PreferencesDialog::staticMetaObject = { {
+    QMetaObject::SuperData::link<QDialog::staticMetaObject>(),
+    qt_staticMetaObjectStaticContent<qt_meta_tag_ZN17PreferencesDialogE_t>.stringdata,
+    qt_staticMetaObjectStaticContent<qt_meta_tag_ZN17PreferencesDialogE_t>.data,
+    qt_static_metacall,
+    nullptr,
+    qt_staticMetaObjectRelocatingContent<qt_meta_tag_ZN17PreferencesDialogE_t>.metaTypes,
+    nullptr
+} };
+
+void PreferencesDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
+    auto *_t = static_cast<PreferencesDialog *>(_o);
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: _t->saveAndAccept(); break;
+        case 1: _t->addProject(); break;
+        case 2: _t->editProject(); break;
+        case 3: _t->deleteProject(); break;
+        case 4: _t->addActivity(); break;
+        case 5: _t->editActivity(); break;
+        case 6: _t->deleteActivity(); break;
+        case 7: _t->loadProjects(); break;
+        case 8: _t->saveProjects(); break;
+        case 9: _t->loadActivities(); break;
+        case 10: _t->saveActivities(); break;
+        case 11: { int _r = _t->loadChimeVolume();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
+        case 12: _t->saveChimeVolume((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        default: ;
+        }
+    }
+}
+
+const QMetaObject *PreferencesDialog::metaObject() const
+{
+    return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
+}
+
+void *PreferencesDialog::qt_metacast(const char *_clname)
+{
+    if (!_clname) return nullptr;
+    if (!strcmp(_clname, qt_staticMetaObjectStaticContent<qt_meta_tag_ZN17PreferencesDialogE_t>.strings))
+        return static_cast<void*>(this);
+    return QDialog::qt_metacast(_clname);
+}
+
+int PreferencesDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QDialog::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 13)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 13;
+    }
+    if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 13)
+            *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
+        _id -= 13;
+    }
+    return _id;
+}
+QT_WARNING_POP

@@ -343,6 +343,8 @@ private:
 };
 
 class FloatingButton : public QPushButton {
+    Q_OBJECT
+
 public:
     explicit FloatingButton(QWidget* parent = nullptr) : QPushButton(parent) {
         setFixedSize(60, 60);  // Start with smaller size for "not tracking"
@@ -377,6 +379,13 @@ public:
         syncState();
         updateAppearance();
     }
+    
+    int getCurrentButtonSize() const {
+        return width();
+    }
+
+signals:
+    void buttonSizeChanged(int newSize);
 
 protected:
     void mousePressEvent(QMouseEvent* event) override {
@@ -547,8 +556,12 @@ private:
             borderRadius = 30;
         }
         
-        // Update button size
+        // Update button size and emit signal if changed
+        int oldSize = width();
         setFixedSize(buttonSize, buttonSize);
+        if (buttonSize != oldSize) {
+            emit buttonSizeChanged(buttonSize);
+        }
         
         if (isTracking && !currentProject.isEmpty()) {
             if (!startTime.isNull()) {
@@ -940,9 +953,10 @@ private:
 };
 
 class DraggableHandle : public QWidget {
+    Q_OBJECT
+    
 public:
     explicit DraggableHandle(QWidget* parent = nullptr) : QWidget(parent) {
-        setFixedSize(140, 140);
         setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
         setAttribute(Qt::WA_TranslucentBackground);
         
@@ -952,11 +966,24 @@ public:
         button = new FloatingButton(this);
         layout->addWidget(button);
         
+        // Connect to button size changes
+        connect(button, &FloatingButton::buttonSizeChanged, this, &DraggableHandle::updateContainerSize);
+        
+        // Set initial size based on button size
+        updateContainerSize(button->getCurrentButtonSize());
+        
         setDefaultPosition();
         loadPosition();
     }
     
     FloatingButton* getFloatingButton() { return button; }
+
+private slots:
+    void updateContainerSize(int buttonSize) {
+        // Container size = button size + margins (10px on each side) + border space (4px on each side)
+        int containerSize = buttonSize + 28;  // 20px for margins + 8px for border space
+        setFixedSize(containerSize, containerSize);
+    }
 
 protected:
     void paintEvent(QPaintEvent*) override {
@@ -1077,6 +1104,8 @@ public:
 };
 
 class PreferencesDialog : public QDialog {
+    Q_OBJECT
+    
 public:
     explicit PreferencesDialog(FloatingButton* floatingButton, QWidget* parent = nullptr) 
         : QDialog(parent), floatingButton(floatingButton) {
@@ -1407,4 +1436,6 @@ int main(int argc, char *argv[]) {
     handle.show();
     
     return app.exec();
-} 
+}
+
+#include "main.moc" 
