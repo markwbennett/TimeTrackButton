@@ -19,9 +19,12 @@ start_chime_process() {
     fi
     
     # Start new chime process in background
+    # First chime happens 6 minutes after tracking starts
     (
+        sleep 360  # Wait 6 minutes for first chime
+        afplay -v 0.1 "/Users/markbennett/github/TimeTrackButton/bells-2-31725.mp3"
         while true; do
-            sleep 360  # 6 minutes = 360 seconds
+            sleep 360  # Then every 6 minutes thereafter
             afplay -v 0.1 "/Users/markbennett/github/TimeTrackButton/bells-2-31725.mp3"
         done
     ) &
@@ -43,6 +46,16 @@ if [ -n "$current_project" ]; then
     # Stop tracking
     echo "Stopping tracking" >> /tmp/time_tracker_click_debug.log
     sqlite3 "$DB_FILE" "UPDATE time_entries SET end_time = strftime('%s', 'now') WHERE end_time IS NULL;"
+    
+    # Stop chime process when tracking stops
+    if [ -f "$CHIME_PID_FILE" ]; then
+        old_pid=$(cat "$CHIME_PID_FILE")
+        if kill -0 "$old_pid" 2>/dev/null; then
+            kill "$old_pid"
+            echo "Stopped chime process" >> /tmp/time_tracker_click_debug.log
+        fi
+        rm -f "$CHIME_PID_FILE"
+    fi
     
     # Export to CSV
     echo "Exporting to CSV" >> /tmp/time_tracker_click_debug.log
@@ -184,12 +197,9 @@ EOF
         elif [ -n "$selected_project" ]; then
             echo "Starting tracking for project: $selected_project" >> /tmp/time_tracker_click_debug.log
             
-            # Check if this is the first time tracking (no entries exist)
-            entry_count=$(sqlite3 "$DB_FILE" "SELECT COUNT(*) FROM time_entries;")
-            if [ "$entry_count" -eq 0 ]; then
-                echo "First time tracking - starting chime process" >> /tmp/time_tracker_click_debug.log
-                start_chime_process
-            fi
+            # Start chime process every time tracking begins
+            echo "Starting chime process for tracking session" >> /tmp/time_tracker_click_debug.log
+            start_chime_process
             
             sqlite3 "$DB_FILE" "INSERT INTO time_entries (project, start_time) VALUES ('$selected_project', strftime('%s', 'now'));"
             afplay -v 0.1 "/Users/markbennett/github/TimeTrackButton/bells-2-31725.mp3"
