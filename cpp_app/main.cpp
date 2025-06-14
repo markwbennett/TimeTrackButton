@@ -32,6 +32,11 @@
 #include <cmath>
 #include <unistd.h>
 #include <fcntl.h>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QScrollArea>
+#include <QtGui/QAction>
 
 class StateManager {
 public:
@@ -993,6 +998,27 @@ private:
     QPoint oldPos;
 };
 
+class AboutDialog : public QDialog {
+public:
+    explicit AboutDialog(QWidget* parent = nullptr) : QDialog(parent) {
+        setWindowTitle("About IACLS Time Tracker");
+        setModal(true);
+        setFixedSize(400, 250);
+        auto* layout = new QVBoxLayout(this);
+        auto* label = new QLabel(
+            "<h2>IACLS Time Tracker</h2>"
+            "<p>This app helps you track your time for legal and professional work."
+            "<br>If you find this app useful, please consider contributing to the Institute for Advanced Criminal Law Studies at <a href=\"https://iacls.org/donate\">iacls.org/donate</a>.</p>",
+            this);
+        label->setOpenExternalLinks(true);
+        label->setWordWrap(true);
+        layout->addWidget(label);
+        auto* ok = new QPushButton("OK", this);
+        connect(ok, &QPushButton::clicked, this, &QDialog::accept);
+        layout->addWidget(ok, 0, Qt::AlignCenter);
+    }
+};
+
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     app.setQuitOnLastWindowClosed(false);
@@ -1001,6 +1027,16 @@ int main(int argc, char *argv[]) {
     app.setOrganizationName("IACLS");
     app.setApplicationName("TimeTracker");
     
+    // Create menu bar and add About action
+    QMenuBar* menuBar = new QMenuBar();
+    QMenu* appMenu = menuBar->addMenu("TimeTracker");
+    QAction* aboutAction = new QAction("About IACLS Time Tracker", &app);
+    appMenu->addAction(aboutAction);
+    QObject::connect(aboutAction, &QAction::triggered, [&]() {
+        AboutDialog aboutDialog;
+        aboutDialog.exec();
+    });
+
     DraggableHandle handle;
     handle.show();
     
