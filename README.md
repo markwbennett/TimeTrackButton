@@ -36,7 +36,7 @@ open TimeTracker_CPP.app
 
 ## Features
 
-- **Floating Button**: Draggable circular button with visual status
+- **Dynamic Button**: Small red circle when not tracking, expands to green when tracking
 - **Project Tracking**: Select projects and activities
 - **Audio Chimes**: 6-minute interval notifications
 - **CSV Export**: Automatic time entry export
