@@ -345,7 +345,7 @@ private:
 class FloatingButton : public QPushButton {
 public:
     explicit FloatingButton(QWidget* parent = nullptr) : QPushButton(parent) {
-        setFixedSize(120, 120);
+        setFixedSize(60, 60);  // Start with smaller size for "not tracking"
         setAttribute(Qt::WA_TranslucentBackground);
         
         isTracking = false;
@@ -535,6 +535,20 @@ private:
     void updateAppearance() {
         QString color = isTracking ? "green" : "red";
         QString text;
+        int buttonSize;
+        int borderRadius;
+        
+        // Set size based on tracking state
+        if (isTracking) {
+            buttonSize = 120;  // Large size when tracking
+            borderRadius = 60;
+        } else {
+            buttonSize = 60;   // Small size when not tracking
+            borderRadius = 30;
+        }
+        
+        // Update button size
+        setFixedSize(buttonSize, buttonSize);
         
         if (isTracking && !currentProject.isEmpty()) {
             if (!startTime.isNull()) {
@@ -564,13 +578,13 @@ private:
         setStyleSheet(QString(
             "QPushButton {"
             "  background-color: %1;"
-            "  border-radius: 60px;"
+            "  border-radius: %2px;"
             "  border: 4px solid white;"
             "  color: white;"
             "  font-weight: bold;"
             "  text-align: center;"
             "}"
-        ).arg(color));
+        ).arg(color).arg(borderRadius));
         
         setText(text);
     }
