@@ -410,6 +410,11 @@ class FloatingButton(QPushButton):
         self.display_timer = QTimer()
         self.display_timer.timeout.connect(self.update_appearance)
         self.display_timer.start(1000)  # 1 second
+        
+        # CSV export timer - ensure CSV is updated regularly
+        self.csv_timer = QTimer()
+        self.csv_timer.timeout.connect(self.export_to_csv)
+        self.csv_timer.start(30000)  # 30 seconds
 
     def get_data_folder(self):
         config_file = Path.home() / ".config" / "timetracker" / "config"
@@ -569,6 +574,9 @@ class FloatingButton(QPushButton):
                 
                 # Update appearance
                 self.update_appearance()
+                
+                # Export CSV when state changes
+                self.export_to_csv()
             
             # Save current state to state file
             self.state_manager.save_state(db_state)

@@ -343,6 +343,11 @@ class FloatingButton(QPushButton):
         self.display_timer = QTimer()
         self.display_timer.timeout.connect(self.update_appearance)
         self.display_timer.start(1000)  # 1 second
+        
+        # CSV export timer - ensure CSV is updated regularly
+        self.csv_timer = QTimer()
+        self.csv_timer.timeout.connect(self.export_to_csv)
+        self.csv_timer.start(30000)  # 30 seconds
     
     def get_data_folder(self):
         """Get or prompt for data folder"""
@@ -428,12 +433,16 @@ class FloatingButton(QPushButton):
                     self.current_project = project
                     self.current_activity = activity or "Legal research"
                     self.start_time = datetime.fromtimestamp(start_time) if start_time else datetime.now()
+                    # Export CSV when state changes
+                    self.export_to_csv()
             else:
                 if self.is_tracking:
                     self.is_tracking = False
                     self.current_project = None
                     self.current_activity = None
                     self.start_time = None
+                    # Export CSV when state changes
+                    self.export_to_csv()
         except Exception as e:
             print(f"Error syncing state: {e}")
     
