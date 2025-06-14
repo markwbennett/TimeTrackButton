@@ -1,6 +1,20 @@
 # IACLS Time Tracker Installation
 
-## Homebrew Installation (Recommended)
+## Easy Installation (Recommended)
+
+### Option 1: One-line installer script
+```bash
+curl -fsSL https://raw.githubusercontent.com/markwbennett/TimeTrackButton/main/install.sh | bash
+```
+
+### Option 2: Download and run installer
+```bash
+curl -O https://raw.githubusercontent.com/markwbennett/TimeTrackButton/main/install.sh
+chmod +x install.sh
+./install.sh
+```
+
+## Homebrew Installation
 
 ### Option 1: Install from this repository
 ```bash
@@ -12,6 +26,8 @@ brew install --cask ./Casks/iacls-time-tracker.rb
 brew tap markwbennett/timetracker https://github.com/markwbennett/TimeTrackButton
 brew install --cask iacls-time-tracker
 ```
+
+**Note**: Homebrew installation may trigger macOS security warnings. Use the installer script above for a smoother experience.
 
 ## Manual Installation
 
