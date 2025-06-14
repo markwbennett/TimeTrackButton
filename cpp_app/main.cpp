@@ -604,7 +604,10 @@ private:
         player = new QMediaPlayer(this);
         audioOutput = new QAudioOutput(this);
         player->setAudioOutput(audioOutput);
-        audioOutput->setVolume(1.0);  // Increased volume from 0.5 to 1.0 for louder chimes
+        
+        // Load volume setting from preferences
+        int volumePercent = loadChimeVolume();
+        audioOutput->setVolume(volumePercent / 100.0);  // Convert percentage to 0.0-1.0 range
         
         // Try to find the sound file in the project directory and data folder
         QStringList possiblePaths = {
@@ -886,6 +889,25 @@ private:
         }
     }
     
+    int loadChimeVolume() {
+        QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/volume";
+        QFile file(configFile);
+        if (file.exists() && file.open(QIODevice::ReadOnly)) {
+            return file.readAll().trimmed().toInt();
+        }
+        return 100; // Default volume
+    }
+
+public:
+    void updateChimeVolume() {
+        if (audioOutput) {
+            int volumePercent = loadChimeVolume();
+            audioOutput->setVolume(volumePercent / 100.0);
+        }
+    }
+
+private:
+    
     bool isTracking;
     QString currentProject;
     QString currentActivity;
@@ -919,6 +941,8 @@ public:
         setDefaultPosition();
         loadPosition();
     }
+    
+    FloatingButton* getFloatingButton() { return button; }
 
 protected:
     void paintEvent(QPaintEvent*) override {
@@ -1040,7 +1064,8 @@ public:
 
 class PreferencesDialog : public QDialog {
 public:
-    explicit PreferencesDialog(QWidget* parent = nullptr) : QDialog(parent) {
+    explicit PreferencesDialog(FloatingButton* floatingButton, QWidget* parent = nullptr) 
+        : QDialog(parent), floatingButton(floatingButton) {
         setWindowTitle("Preferences");
         setModal(true);
         setFixedSize(500, 400);
@@ -1147,6 +1172,12 @@ private slots:
         saveChimeVolume(volumeSlider->value());
         saveProjects();
         saveActivities();
+        
+        // Update the floating button's volume
+        if (floatingButton) {
+            floatingButton->updateChimeVolume();
+        }
+        
         accept();
     }
     
@@ -1327,6 +1358,7 @@ private:
     QSlider* volumeSlider;
     QListWidget* projectsList;
     QListWidget* activitiesList;
+    FloatingButton* floatingButton;
 };
 
 int main(int argc, char *argv[]) {
@@ -1350,14 +1382,14 @@ int main(int argc, char *argv[]) {
     
     appMenu->addSeparator();
     
+    DraggableHandle handle;
+    
     QAction* preferencesAction = new QAction("Preferences...", &app);
     appMenu->addAction(preferencesAction);
-    QObject::connect(preferencesAction, &QAction::triggered, [&]() {
-        PreferencesDialog preferencesDialog;
+    QObject::connect(preferencesAction, &QAction::triggered, [&handle]() {
+        PreferencesDialog preferencesDialog(handle.getFloatingButton());
         preferencesDialog.exec();
     });
-
-    DraggableHandle handle;
     handle.show();
     
     return app.exec();
