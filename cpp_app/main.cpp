@@ -783,24 +783,37 @@ private:
                 if (activityDialog->exec() == QDialog::Accepted) {
                     QString newActivity = activityDialog->getActivity();
                     if (!newActivity.isEmpty()) {
-                        // Update both project and activity in the database
+                        // End current session and start new one (restart timer)
+                        QDateTime endTime = QDateTime::currentDateTime();
+                        
+                        // Update current session with end time
                         QSqlQuery query;
-                        query.prepare("UPDATE time_entries SET project = ?, activity = ? WHERE end_time IS NULL");
-                        query.addBindValue(newProject);
-                        query.addBindValue(newActivity);
+                        query.prepare("UPDATE time_entries SET end_time = ? WHERE end_time IS NULL");
+                        query.addBindValue(endTime.toSecsSinceEpoch());
                         query.exec();
                         
-                        // Update internal state
+                        // Start new session with new project and activity
+                        startTime = QDateTime::currentDateTime();
                         currentProject = newProject;
                         currentActivity = newActivity;
                         
-                        // Update state file
+                        // Insert new entry
+                        query.prepare("INSERT INTO time_entries (project, activity, start_time) VALUES (?, ?, ?)");
+                        query.addBindValue(newProject);
+                        query.addBindValue(newActivity);
+                        query.addBindValue(startTime.toSecsSinceEpoch());
+                        query.exec();
+                        
+                        // Update state file with new start time
                         QJsonObject state;
                         state["is_tracking"] = true;
                         state["project"] = newProject;
                         state["activity"] = newActivity;
                         state["start_time"] = startTime.toSecsSinceEpoch();
                         stateManager->saveState(state);
+                        
+                        // Reset chime timer for new session
+                        lastKnownSessionStart = startTime.toSecsSinceEpoch();
                         
                         // Regenerate CSV
                         exportToCsv();
@@ -1190,6 +1203,16 @@ private slots:
     }
     
     void loadProjects() {
+        // Load projects from database (same as getProjects() method)
+        QSqlDatabase db = QSqlDatabase::database();
+        if (db.isValid()) {
+            QSqlQuery query("SELECT DISTINCT project FROM time_entries WHERE project NOT LIKE '[HIDDEN]%' ORDER BY project");
+            while (query.next()) {
+                projectsList->addItem(query.value(0).toString());
+            }
+        }
+        
+        // Also load any additional projects from config file
         QString dataDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/TimeTracker";
         QString configFile = dataDir + "/.config/projects";
         QFile file(configFile);
@@ -1198,7 +1221,17 @@ private slots:
             while (!in.atEnd()) {
                 QString line = in.readLine().trimmed();
                 if (!line.isEmpty()) {
-                    projectsList->addItem(line);
+                    // Only add if not already in list
+                    bool found = false;
+                    for (int i = 0; i < projectsList->count(); ++i) {
+                        if (projectsList->item(i)->text() == line) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        projectsList->addItem(line);
+                    }
                 }
             }
         }
@@ -1220,8 +1253,18 @@ private slots:
     }
     
     void loadActivities() {
-        QString dataDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/TimeTracker";
-        QString configFile = dataDir + "/.config/activities";
+        // Load base activities (same as ActivityDialog)
+        QStringList baseActivities = {
+            "Legal research", "Investigation", "Discovery Review",
+            "File Review", "Client Communication"
+        };
+        
+        for (const QString& activity : baseActivities) {
+            activitiesList->addItem(activity);
+        }
+        
+        // Load custom activities from the same location as ActivityDialog
+        QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/custom_activities";
         QFile file(configFile);
         if (file.exists() && file.open(QIODevice::ReadOnly)) {
             QTextStream in(&file);
@@ -1231,18 +1274,20 @@ private slots:
                     activitiesList->addItem(line);
                 }
             }
-        } else {
-            // Default activities
-            QStringList defaults = {"Research", "Writing", "Meeting", "Review", "Admin", "Other"};
-            for (const QString& activity : defaults) {
-                activitiesList->addItem(activity);
-            }
         }
+        
+        // Add "Other" at the end
+        activitiesList->addItem("Other");
     }
     
     void saveActivities() {
-        QString dataDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/TimeTracker";
-        QString configFile = dataDir + "/.config/activities";
+        // Save only custom activities (excluding base activities and "Other")
+        QStringList baseActivities = {
+            "Legal research", "Investigation", "Discovery Review",
+            "File Review", "Client Communication", "Other"
+        };
+        
+        QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/custom_activities";
         QFileInfo configInfo(configFile);
         QDir().mkpath(configInfo.absolutePath());
         
@@ -1250,7 +1295,10 @@ private slots:
         if (file.open(QIODevice::WriteOnly)) {
             QTextStream out(&file);
             for (int i = 0; i < activitiesList->count(); ++i) {
-                out << activitiesList->item(i)->text() << "\n";
+                QString activity = activitiesList->item(i)->text();
+                if (!baseActivities.contains(activity)) {
+                    out << activity << "\n";
+                }
             }
         }
     }
