@@ -842,10 +842,38 @@ class FloatingButton(QPushButton):
             for row in rows:
                 id_val, project, activity, start_time, end_time = row
                 
-                # Convert timestamps to local datetime strings
-                start_dt = datetime.fromtimestamp(start_time) if start_time else None
-                end_dt = datetime.fromtimestamp(end_time) if end_time else None
+                # Handle mixed timestamp formats (Unix timestamps vs datetime strings)
+                start_dt = None
+                end_dt = None
                 
+                # Convert start_time
+                if start_time:
+                    try:
+                        if isinstance(start_time, (int, float)):
+                            # Unix timestamp
+                            start_dt = datetime.fromtimestamp(start_time)
+                        else:
+                            # String datetime
+                            start_dt = datetime.fromisoformat(str(start_time).replace(' ', 'T'))
+                    except (ValueError, TypeError, OSError) as e:
+                        print(f"Error parsing start_time {start_time}: {e}")
+                        continue
+                
+                # Convert end_time
+                if end_time:
+                    try:
+                        if isinstance(end_time, (int, float)):
+                            # Unix timestamp
+                            end_dt = datetime.fromtimestamp(end_time)
+                        else:
+                            # String datetime
+                            end_dt = datetime.fromisoformat(str(end_time).replace(' ', 'T'))
+                    except (ValueError, TypeError, OSError) as e:
+                        print(f"Error parsing end_time {end_time}: {e}")
+                        # If end_time is invalid but start_time is valid, treat as ongoing
+                        pass
+                
+                # Format datetime strings
                 start_str = start_dt.strftime('%Y-%m-%d %H:%M:%S') if start_dt else ''
                 end_str = end_dt.strftime('%Y-%m-%d %H:%M:%S') if end_dt else ''
                 
@@ -878,8 +906,11 @@ class FloatingButton(QPushButton):
             
             df = pd.DataFrame(csv_data)
             df.to_csv(self.csv_path, index=False)
+            print(f"CSV exported successfully to {self.csv_path} with {len(csv_data)} entries")
         except Exception as e:
             print(f"Error exporting CSV: {e}")
+            import traceback
+            traceback.print_exc()
 
 def main():
     app = QApplication(sys.argv)

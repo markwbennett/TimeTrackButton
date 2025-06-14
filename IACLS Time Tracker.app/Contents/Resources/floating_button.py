@@ -54,7 +54,7 @@ class StateManager:
         try:
             conn = sqlite3.connect(str(self.db_file))
             cursor = conn.cursor()
-            cursor.execute("SELECT project, start_time FROM time_entries WHERE end_time IS NULL ORDER BY start_time DESC LIMIT 1")
+            cursor.execute("SELECT project, activity, start_time FROM time_entries WHERE end_time IS NULL ORDER BY start_time DESC LIMIT 1")
             result = cursor.fetchone()
             conn.close()
             
@@ -62,13 +62,15 @@ class StateManager:
                 return {
                     'is_tracking': True,
                     'project': result[0],
-                    'start_time': result[1],
+                    'activity': result[1] if len(result) > 1 else '',
+                    'start_time': result[2] if len(result) > 2 else result[1],
                     'last_updated': int(time.time())
                 }
             else:
                 return {
                     'is_tracking': False,
                     'project': None,
+                    'activity': None,
                     'start_time': None,
                     'last_updated': int(time.time())
                 }
@@ -410,11 +412,6 @@ class FloatingButton(QPushButton):
         self.display_timer = QTimer()
         self.display_timer.timeout.connect(self.update_appearance)
         self.display_timer.start(1000)  # 1 second
-        
-        # CSV export timer - ensure CSV is updated regularly
-        self.csv_timer = QTimer()
-        self.csv_timer.timeout.connect(self.export_to_csv)
-        self.csv_timer.start(30000)  # 30 seconds
 
     def get_data_folder(self):
         config_file = Path.home() / ".config" / "timetracker" / "config"
@@ -574,9 +571,6 @@ class FloatingButton(QPushButton):
                 
                 # Update appearance
                 self.update_appearance()
-                
-                # Export CSV when state changes
-                self.export_to_csv()
             
             # Save current state to state file
             self.state_manager.save_state(db_state)
