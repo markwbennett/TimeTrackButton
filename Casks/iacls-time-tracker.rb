@@ -9,6 +9,12 @@ cask "iacls-time-tracker" do
 
   app "TimeTracker_CPP.app", target: "IACLS Time Tracker.app"
 
+  postflight do
+    system_command "/usr/bin/xattr",
+                   args: ["-dr", "com.apple.quarantine", "#{appdir}/IACLS Time Tracker.app"],
+                   sudo: false
+  end
+
   zap trash: [
     "~/Documents/TimeTracker",
     "~/.config/timetracker",

@@ -27,7 +27,7 @@ brew tap markwbennett/timetracker https://github.com/markwbennett/TimeTrackButto
 brew install --cask iacls-time-tracker
 ```
 
-**Note**: Homebrew installation may trigger macOS security warnings. Use the installer script above for a smoother experience.
+**Note**: The Homebrew Cask automatically removes quarantine attributes to prevent "damaged app" warnings.
 
 ## Manual Installation
 
