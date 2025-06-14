@@ -1,0 +1,120 @@
+#!/bin/bash
+
+# IACLS Time Tracker Easy Installer
+# This script installs Homebrew (if needed) and IACLS Time Tracker
+
+set -e  # Exit on any error
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Function to show progress dialog
+show_progress() {
+    local message="$1"
+    echo -e "${BLUE}📦 ${message}${NC}"
+    osascript -e "display notification \"${message}\" with title \"IACLS Time Tracker Installer\""
+}
+
+# Function to show error dialog
+show_error() {
+    local message="$1"
+    echo -e "${RED}❌ ${message}${NC}"
+    osascript -e "display dialog \"Error: ${message}\" with title \"Installation Failed\" buttons {\"OK\"} default button \"OK\" with icon stop"
+}
+
+# Function to show success dialog
+show_success() {
+    local message="$1"
+    echo -e "${GREEN}✅ ${message}${NC}"
+    osascript -e "display dialog \"${message}\" with title \"Installation Complete\" buttons {\"Launch App\", \"Close\"} default button \"Launch App\" with icon note" -e "set result to button returned of result" -e "if result is \"Launch App\" then" -e "do shell script \"open '/Applications/IACLS Time Tracker.app'\"" -e "end if"
+}
+
+# Function to check if Homebrew is installed
+check_homebrew() {
+    if command -v brew >/dev/null 2>&1; then
+        echo -e "${GREEN}✅ Homebrew is already installed${NC}"
+        return 0
+    else
+        echo -e "${YELLOW}⚠️  Homebrew not found${NC}"
+        return 1
+    fi
+}
+
+# Function to install Homebrew
+install_homebrew() {
+    show_progress "Installing Homebrew..."
+    
+    # Show initial dialog
+    osascript -e 'display dialog "This installer will install Homebrew (a package manager for macOS) and then install IACLS Time Tracker.\n\nYou may be prompted for your password during installation.\n\nClick OK to continue." with title "IACLS Time Tracker Easy Installer" buttons {"Cancel", "OK"} default button "OK" with icon note' >/dev/null 2>&1 || {
+        echo "Installation cancelled by user"
+        exit 0
+    }
+    
+    # Install Homebrew
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || {
+        show_error "Failed to install Homebrew"
+        exit 1
+    }
+    
+    # Add Homebrew to PATH for this session
+    if [[ -f "/opt/homebrew/bin/brew" ]]; then
+        # Apple Silicon Mac
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [[ -f "/usr/local/bin/brew" ]]; then
+        # Intel Mac
+        eval "$(/usr/local/bin/brew shellenv)"
+    fi
+    
+    echo -e "${GREEN}✅ Homebrew installed successfully${NC}"
+}
+
+# Function to install IACLS Time Tracker
+install_time_tracker() {
+    show_progress "Adding IACLS tap to Homebrew..."
+    
+    # Add the tap
+    brew tap markwbennett/iacls || {
+        show_error "Failed to add IACLS tap"
+        exit 1
+    }
+    
+    show_progress "Installing IACLS Time Tracker..."
+    
+    # Install the cask
+    brew install --cask iacls-time-tracker || {
+        show_error "Failed to install IACLS Time Tracker"
+        exit 1
+    }
+    
+    echo -e "${GREEN}✅ IACLS Time Tracker installed successfully${NC}"
+}
+
+# Main installation process
+main() {
+    echo -e "${BLUE}🚀 IACLS Time Tracker Easy Installer${NC}"
+    echo "=================================================="
+    
+    # Check if running with proper permissions
+    if [[ $EUID -eq 0 ]]; then
+        show_error "Please do not run this installer as root (sudo)"
+        exit 1
+    fi
+    
+    # Check and install Homebrew if needed
+    if ! check_homebrew; then
+        install_homebrew
+    fi
+    
+    # Install IACLS Time Tracker
+    install_time_tracker
+    
+    # Success!
+    show_success "IACLS Time Tracker has been installed successfully!\n\nYou can find it in your Applications folder or launch it now."
+}
+
+# Run the installer
+main "$@" 

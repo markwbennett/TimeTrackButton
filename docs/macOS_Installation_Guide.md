@@ -3,8 +3,7 @@
 ## System Requirements
 
 - **macOS**: 10.15 (Catalina) or later
-- **SketchyBar**: Required for menu bar integration
-- **Python**: 3.8 or later (for manual installation)
+- **Python**: 3.8 or later (included with macOS)
 - **Homebrew**: Recommended for easy installation
 
 ## Security Requirements
@@ -42,7 +41,24 @@ Grant permissions in System Preferences → Security & Privacy → Privacy.
 
 ## Installation Methods
 
-### Method 1: Homebrew (Recommended)
+### Method 1: Easy Installer (Recommended for Beginners)
+
+1. **Download the latest release** from GitHub
+2. **Extract the ZIP file**
+3. **Double-click** `Easy_Installer.app`
+4. **Follow the prompts**:
+   - Click "OK" to start installation
+   - Enter your password when prompted (for Homebrew)
+   - Wait for installation to complete
+   - Click "Launch App" when finished
+
+The Easy Installer will:
+- Install Homebrew if not already present
+- Add the IACLS tap to Homebrew
+- Install IACLS Time Tracker
+- Offer to launch the app immediately
+
+### Method 2: Homebrew (For Existing Homebrew Users)
 
 1. **Install Homebrew** (if not already installed):
    ```bash
@@ -59,56 +75,47 @@ Grant permissions in System Preferences → Security & Privacy → Privacy.
    brew install --cask iacls-time-tracker
    ```
 
-4. **Configure SketchyBar**:
-   The installer will automatically:
-   - Install SketchyBar plugins
-   - Create example configuration
-   - Set up required directories
-
-5. **Add to SketchyBar configuration**:
-   Add this line to your `~/.config/sketchybar/sketchybarrc`:
+4. **Launch the app**:
    ```bash
-   sketchybar --add item time_tracker right \
-              --set time_tracker update_freq=10 \
-                    script="$PLUGIN_DIR/time_tracker.sh" \
-                    click_script="$PLUGIN_DIR/time_tracker_click.sh"
+   open "/Applications/IACLS Time Tracker.app"
    ```
 
-6. **Reload SketchyBar**:
-   ```bash
-   sketchybar --reload
-   ```
-
-### Method 2: Manual Installation
+### Method 3: Manual Installation
 
 1. **Download the latest release** from GitHub
-2. **Extract the archive** to your Applications folder
-3. **Install dependencies**:
+2. **Extract the archive** and move `IACLS Time Tracker.app` to your Applications folder
+3. **Launch the app**:
    ```bash
-   # Install Python dependencies
-   pip3 install PyQt6 pandas
-   
-   # Or use the provided script
-   ./setup_timetracker.sh
+   open "/Applications/IACLS Time Tracker.app"
    ```
 
-4. **Set up SketchyBar plugins**:
-   ```bash
-   # Create plugins directory
-   mkdir -p ~/.config/sketchybar/plugins
-   
-   # Create symlinks
-   ln -sf "$(pwd)/plugins/time_tracker.sh" ~/.config/sketchybar/plugins/
-   ln -sf "$(pwd)/plugins/time_tracker_click.sh" ~/.config/sketchybar/plugins/
-   ```
+### SketchyBar Integration (Advanced Users)
 
-5. **Configure SketchyBar** (same as Homebrew method above)
+For SketchyBar menu bar integration, clone the full repository:
+
+```bash
+git clone https://github.com/markwbennett/TimeTrackButton.git
+cd TimeTrackButton
+
+# Set up SketchyBar plugins
+mkdir -p ~/.config/sketchybar/plugins
+ln -sf "$(pwd)/plugins/time_tracker.sh" ~/.config/sketchybar/plugins/
+ln -sf "$(pwd)/plugins/time_tracker_click.sh" ~/.config/sketchybar/plugins/
+
+# Add to SketchyBar configuration
+echo 'sketchybar --add item time_tracker right \
+          --set time_tracker update_freq=10 \
+                script="$PLUGIN_DIR/time_tracker.sh" \
+                click_script="$PLUGIN_DIR/time_tracker_click.sh"' >> ~/.config/sketchybar/sketchybarrc
+
+# Reload SketchyBar
+sketchybar --reload
+```
 
 ## First Run Setup
 
 1. **Launch the app**:
-   - Double-click `IACLS Time Tracker.app`, or
-   - Click the time tracker icon in SketchyBar
+   - Double-click `IACLS Time Tracker.app`
 
 2. **Choose data folder**:
    - A folder selection dialog will appear
@@ -124,7 +131,7 @@ Grant permissions in System Preferences → Security & Privacy → Privacy.
 
 ### Starting Time Tracking
 
-1. **Click the SketchyBar icon** or **floating button**
+1. **Click the floating button** (or SketchyBar icon if installed)
 2. **Select a project** from the dropdown or create new
 3. **Choose activity type** (Legal research, Investigation, etc.)
 4. **Tracking begins** with audio confirmation

@@ -3,8 +3,10 @@
 ## System Requirements
 
 - **Windows**: 10 or later (64-bit recommended)
-- **Python**: 3.8 or later (for manual installation)
+- **Python**: 3.8 or later (for source installation)
 - **Administrator privileges**: Required for initial setup
+
+**Note**: This distribution includes only the GUI floating button app. SketchyBar integration is macOS-only.
 
 ## Security Requirements
 

@@ -112,7 +112,14 @@ SELECT
                 (strftime('%s', 'now') - start_time) % 60
             )
         ELSE ''
-    END as "Duration"
+    END as "Duration",
+    CASE 
+        WHEN end_time IS NOT NULL THEN 
+            printf('%.1f', CAST((CAST((end_time - start_time) AS REAL) / 3600.0 * 10.0) + 0.9 AS INTEGER) / 10.0)
+        WHEN start_time IS NOT NULL THEN
+            printf('%.1f', CAST((CAST((strftime('%s', 'now') - start_time) AS REAL) / 3600.0 * 10.0) + 0.9 AS INTEGER) / 10.0)
+        ELSE ''
+    END as "Hours"
 FROM time_entries;
 EOF
 }
