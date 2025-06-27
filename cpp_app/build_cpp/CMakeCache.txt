@@ -383,7 +383,7 @@ CMAKE_CACHE_MAJOR_VERSION:INTERNAL=4
 //Minor version of cmake used to create the current loaded cache
 CMAKE_CACHE_MINOR_VERSION:INTERNAL=0
 //Patch version of cmake used to create the current loaded cache
-CMAKE_CACHE_PATCH_VERSION:INTERNAL=2
+CMAKE_CACHE_PATCH_VERSION:INTERNAL=3
 //ADVANCED property for variable: CMAKE_COLOR_MAKEFILE
 CMAKE_COLOR_MAKEFILE-ADVANCED:INTERNAL=1
 //Path to CMake executable.
@@ -677,6 +677,8 @@ QT_FEATURE_cxx11_future:INTERNAL=ON
 QT_FEATURE_cxx17_filesystem:INTERNAL=ON
 //Qt feature: cxx20 (from target Qt6::Core)
 QT_FEATURE_cxx20:INTERNAL=OFF
+//Qt feature: cxx20_format (from target Qt6::Core)
+QT_FEATURE_cxx20_format:INTERNAL=OFF
 //Qt feature: cxx23_stacktrace (from target Qt6::Core)
 QT_FEATURE_cxx23_stacktrace:INTERNAL=OFF
 //Qt feature: cxx2a (from target Qt6::Core)
@@ -781,8 +783,6 @@ QT_FEATURE_errormessage:INTERNAL=ON
 QT_FEATURE_etw:INTERNAL=OFF
 //Qt feature: evdev (from target Qt6::Gui)
 QT_FEATURE_evdev:INTERNAL=OFF
-//Qt feature: evr (from target Qt6::Multimedia)
-QT_FEATURE_evr:INTERNAL=OFF
 //Qt feature: f16c (from target Qt6::Core)
 QT_FEATURE_f16c:INTERNAL=OFF
 //Qt feature: ffmpeg (from target Qt6::Multimedia)

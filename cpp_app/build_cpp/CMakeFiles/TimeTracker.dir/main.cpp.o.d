@@ -1,10 +1,10 @@
 CMakeFiles/TimeTracker.dir/main.cpp.o: \
   /Users/markbennett/github/TimeTrackButton/cpp_app/main.cpp \
-  /opt/homebrew/opt/qt/include/QtWidgets/QApplication \
-  /opt/homebrew/opt/qt/include/QtWidgets/qapplication.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qtwidgetsglobal.h \
-  /opt/homebrew/opt/qt/include/QtGui/qtguiglobal.h \
-  /opt/homebrew/opt/qt/include/QtCore/qglobal.h \
+  /usr/local/include/QtWidgets/QApplication \
+  /usr/local/include/QtWidgets/qapplication.h \
+  /usr/local/include/QtWidgets/qtwidgetsglobal.h \
+  /usr/local/include/QtGui/qtguiglobal.h \
+  /usr/local/include/QtCore/qglobal.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__assert \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__assertion_handler \
@@ -333,33 +333,32 @@ CMakeFiles/TimeTracker.dir/main.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/stdbool.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/16/include/stdbool.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/16/include/__stddef_rsize_t.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtcoreglobal.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtversionchecks.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtconfiginclude.h \
-  /opt/homebrew/opt/qt/include/QtCore/qconfig.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtcore-config.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtconfigmacros.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtdeprecationdefinitions.h \
-  /opt/homebrew/opt/qt/include/QtCore/qcompilerdetection.h \
-  /opt/homebrew/opt/qt/include/QtCore/qprocessordetection.h \
-  /opt/homebrew/opt/qt/include/QtCore/qsystemdetection.h \
+  /usr/local/include/QtCore/qtcoreglobal.h \
+  /usr/local/include/QtCore/qtversionchecks.h \
+  /usr/local/include/QtCore/qtconfiginclude.h \
+  /usr/local/include/QtCore/qconfig.h \
+  /usr/local/include/QtCore/qtcore-config.h \
+  /usr/local/include/QtCore/qtconfigmacros.h \
+  /usr/local/include/QtCore/qtdeprecationdefinitions.h \
+  /usr/local/include/QtCore/qcompilerdetection.h \
+  /usr/local/include/QtCore/qprocessordetection.h \
+  /usr/local/include/QtCore/qsystemdetection.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityMacros.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/atomic \
-  /opt/homebrew/opt/qt/include/QtCore/qtcoreexports.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtdeprecationmarkers.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtclasshelpermacros.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtpreprocessorsupport.h \
-  /opt/homebrew/opt/qt/include/QtCore/qassert.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtnoop.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtypes.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtversion.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtypeinfo.h \
-  /opt/homebrew/opt/qt/include/QtCore/qcontainerfwd.h \
-  /opt/homebrew/opt/qt/include/QtCore/qsysinfo.h \
-  /opt/homebrew/opt/qt/include/QtCore/qlogging.h \
-  /opt/homebrew/opt/qt/include/QtCore/qflags.h \
-  /opt/homebrew/opt/qt/include/QtCore/qcompare_impl.h \
+  /usr/local/include/QtCore/qtcoreexports.h \
+  /usr/local/include/QtCore/qtdeprecationmarkers.h \
+  /usr/local/include/QtCore/qtclasshelpermacros.h \
+  /usr/local/include/QtCore/qtpreprocessorsupport.h \
+  /usr/local/include/QtCore/qassert.h /usr/local/include/QtCore/qtnoop.h \
+  /usr/local/include/QtCore/qtypes.h \
+  /usr/local/include/QtCore/qtversion.h \
+  /usr/local/include/QtCore/qtypeinfo.h \
+  /usr/local/include/QtCore/qcontainerfwd.h \
+  /usr/local/include/QtCore/qsysinfo.h \
+  /usr/local/include/QtCore/qlogging.h \
+  /usr/local/include/QtCore/qflags.h \
+  /usr/local/include/QtCore/qcompare_impl.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/algorithm \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/adjacent_find.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/comp.h \
@@ -830,38 +829,37 @@ CMakeFiles/TimeTracker.dir/main.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__bit/byteswap.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__bit/endian.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__bit/has_single_bit.h \
-  /opt/homebrew/opt/qt/include/QtCore/qatomic.h \
-  /opt/homebrew/opt/qt/include/QtCore/qbasicatomic.h \
-  /opt/homebrew/opt/qt/include/QtCore/qatomic_cxx11.h \
-  /opt/homebrew/opt/qt/include/QtCore/qgenericatomic.h \
-  /opt/homebrew/opt/qt/include/QtCore/qyieldcpu.h \
-  /opt/homebrew/opt/qt/include/QtCore/qconstructormacros.h \
-  /opt/homebrew/opt/qt/include/QtCore/qdarwinhelpers.h \
-  /opt/homebrew/opt/qt/include/QtCore/qexceptionhandling.h \
-  /opt/homebrew/opt/qt/include/QtCore/qforeach.h \
-  /opt/homebrew/opt/qt/include/QtCore/qttypetraits.h \
-  /opt/homebrew/opt/qt/include/QtCore/qfunctionpointer.h \
-  /opt/homebrew/opt/qt/include/QtCore/qglobalstatic.h \
-  /opt/homebrew/opt/qt/include/QtCore/qmalloc.h \
-  /opt/homebrew/opt/qt/include/QtCore/qminmax.h \
-  /opt/homebrew/opt/qt/include/QtCore/qnumeric.h \
-  /opt/homebrew/opt/qt/include/QtCore/qoverload.h \
-  /opt/homebrew/opt/qt/include/QtCore/qswap.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtenvironmentvariables.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtresource.h \
-  /opt/homebrew/opt/qt/include/QtCore/qttranslation.h \
-  /opt/homebrew/opt/qt/include/QtCore/qversiontagging.h \
-  /opt/homebrew/opt/qt/include/QtGui/qtgui-config.h \
-  /opt/homebrew/opt/qt/include/QtGui/qtguiexports.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qtwidgets-config.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qtwidgetsexports.h \
-  /opt/homebrew/opt/qt/include/QtCore/qcoreapplication.h \
-  /opt/homebrew/opt/qt/include/QtCore/qstring.h \
-  /opt/homebrew/opt/qt/include/QtCore/qchar.h \
-  /opt/homebrew/opt/qt/include/QtCore/qcompare.h \
-  /opt/homebrew/opt/qt/include/QtCore/qstdlibdetection.h \
-  /opt/homebrew/opt/qt/include/QtCore/qcomparehelpers.h \
-  /opt/homebrew/opt/qt/include/QtCore/q20type_traits.h \
+  /usr/local/include/QtCore/qatomic.h \
+  /usr/local/include/QtCore/qbasicatomic.h \
+  /usr/local/include/QtCore/qatomic_cxx11.h \
+  /usr/local/include/QtCore/qgenericatomic.h \
+  /usr/local/include/QtCore/qyieldcpu.h \
+  /usr/local/include/QtCore/qconstructormacros.h \
+  /usr/local/include/QtCore/qdarwinhelpers.h \
+  /usr/local/include/QtCore/qexceptionhandling.h \
+  /usr/local/include/QtCore/qforeach.h \
+  /usr/local/include/QtCore/qttypetraits.h \
+  /usr/local/include/QtCore/qfunctionpointer.h \
+  /usr/local/include/QtCore/qglobalstatic.h \
+  /usr/local/include/QtCore/qmalloc.h \
+  /usr/local/include/QtCore/qminmax.h \
+  /usr/local/include/QtCore/qnumeric.h \
+  /usr/local/include/QtCore/qoverload.h \
+  /usr/local/include/QtCore/qswap.h \
+  /usr/local/include/QtCore/qtenvironmentvariables.h \
+  /usr/local/include/QtCore/qtresource.h \
+  /usr/local/include/QtCore/qttranslation.h \
+  /usr/local/include/QtCore/qversiontagging.h \
+  /usr/local/include/QtGui/qtgui-config.h \
+  /usr/local/include/QtGui/qtguiexports.h \
+  /usr/local/include/QtWidgets/qtwidgets-config.h \
+  /usr/local/include/QtWidgets/qtwidgetsexports.h \
+  /usr/local/include/QtCore/qcoreapplication.h \
+  /usr/local/include/QtCore/qstring.h /usr/local/include/QtCore/qchar.h \
+  /usr/local/include/QtCore/qcompare.h \
+  /usr/local/include/QtCore/qstdlibdetection.h \
+  /usr/local/include/QtCore/qcomparehelpers.h \
+  /usr/local/include/QtCore/q20type_traits.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/functional \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__functional/binary_negate.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__functional/bind.h \
@@ -994,41 +992,41 @@ CMakeFiles/TimeTracker.dir/main.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__functional/pointer_to_binary_function.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__functional/pointer_to_unary_function.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__functional/unary_negate.h \
-  /opt/homebrew/opt/qt/include/QtCore/qstringview.h \
-  /opt/homebrew/opt/qt/include/QtCore/qbytearray.h \
-  /opt/homebrew/opt/qt/include/QtCore/qrefcount.h \
-  /opt/homebrew/opt/qt/include/QtCore/qnamespace.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtmetamacros.h \
-  /opt/homebrew/opt/qt/include/QtCore/qarraydata.h \
-  /opt/homebrew/opt/qt/include/QtCore/qpair.h \
-  /opt/homebrew/opt/qt/include/QtCore/qarraydatapointer.h \
-  /opt/homebrew/opt/qt/include/QtCore/qarraydataops.h \
-  /opt/homebrew/opt/qt/include/QtCore/qcontainertools_impl.h \
-  /opt/homebrew/opt/qt/include/QtCore/qxptype_traits.h \
-  /opt/homebrew/opt/qt/include/QtCore/q20functional.h \
-  /opt/homebrew/opt/qt/include/QtCore/q20memory.h \
-  /opt/homebrew/opt/qt/include/QtCore/q17memory.h \
-  /opt/homebrew/opt/qt/include/QtCore/qbytearrayalgorithms.h \
-  /opt/homebrew/opt/qt/include/QtCore/qbytearrayview.h \
-  /opt/homebrew/opt/qt/include/QtCore/qstringfwd.h \
-  /opt/homebrew/opt/qt/include/QtCore/qstringliteral.h \
-  /opt/homebrew/opt/qt/include/QtCore/qstringalgorithms.h \
-  /opt/homebrew/opt/qt/include/QtCore/qlatin1stringview.h \
-  /opt/homebrew/opt/qt/include/QtCore/qanystringview.h \
-  /opt/homebrew/opt/qt/include/QtCore/qutf8stringview.h \
-  /opt/homebrew/opt/qt/include/QtCore/qstringtokenizer.h \
-  /opt/homebrew/opt/qt/include/QtCore/qstringbuilder.h \
-  /opt/homebrew/opt/qt/include/QtCore/qstringconverter.h \
-  /opt/homebrew/opt/qt/include/QtCore/qstringconverter_base.h \
-  /opt/homebrew/opt/qt/include/QtCore/qcoreevent.h \
-  /opt/homebrew/opt/qt/include/QtCore/qbasictimer.h \
-  /opt/homebrew/opt/qt/include/QtCore/qabstracteventdispatcher.h \
-  /opt/homebrew/opt/qt/include/QtCore/qobject.h \
-  /opt/homebrew/opt/qt/include/QtCore/qobjectdefs.h \
-  /opt/homebrew/opt/qt/include/QtCore/qobjectdefs_impl.h \
-  /opt/homebrew/opt/qt/include/QtCore/qfunctionaltools_impl.h \
-  /opt/homebrew/opt/qt/include/QtCore/qlist.h \
-  /opt/homebrew/opt/qt/include/QtCore/qhashfunctions.h \
+  /usr/local/include/QtCore/qstringview.h \
+  /usr/local/include/QtCore/qbytearray.h \
+  /usr/local/include/QtCore/qrefcount.h \
+  /usr/local/include/QtCore/qnamespace.h \
+  /usr/local/include/QtCore/qtmetamacros.h \
+  /usr/local/include/QtCore/qarraydata.h \
+  /usr/local/include/QtCore/qpair.h \
+  /usr/local/include/QtCore/qarraydatapointer.h \
+  /usr/local/include/QtCore/qarraydataops.h \
+  /usr/local/include/QtCore/qcontainertools_impl.h \
+  /usr/local/include/QtCore/qxptype_traits.h \
+  /usr/local/include/QtCore/q20functional.h \
+  /usr/local/include/QtCore/q20memory.h \
+  /usr/local/include/QtCore/q17memory.h \
+  /usr/local/include/QtCore/qbytearrayalgorithms.h \
+  /usr/local/include/QtCore/qbytearrayview.h \
+  /usr/local/include/QtCore/qstringfwd.h \
+  /usr/local/include/QtCore/qstringliteral.h \
+  /usr/local/include/QtCore/qstringalgorithms.h \
+  /usr/local/include/QtCore/qlatin1stringview.h \
+  /usr/local/include/QtCore/qanystringview.h \
+  /usr/local/include/QtCore/qutf8stringview.h \
+  /usr/local/include/QtCore/qstringtokenizer.h \
+  /usr/local/include/QtCore/qstringbuilder.h \
+  /usr/local/include/QtCore/qstringconverter.h \
+  /usr/local/include/QtCore/qstringconverter_base.h \
+  /usr/local/include/QtCore/qcoreevent.h \
+  /usr/local/include/QtCore/qbasictimer.h \
+  /usr/local/include/QtCore/qabstracteventdispatcher.h \
+  /usr/local/include/QtCore/qobject.h \
+  /usr/local/include/QtCore/qobjectdefs.h \
+  /usr/local/include/QtCore/qobjectdefs_impl.h \
+  /usr/local/include/QtCore/qfunctionaltools_impl.h \
+  /usr/local/include/QtCore/qlist.h \
+  /usr/local/include/QtCore/qhashfunctions.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/numeric \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__numeric/accumulate.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__numeric/adjacent_difference.h \
@@ -1043,28 +1041,27 @@ CMakeFiles/TimeTracker.dir/main.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__numeric/saturation_arithmetic.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__numeric/transform_exclusive_scan.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__numeric/transform_inclusive_scan.h \
-  /opt/homebrew/opt/qt/include/QtCore/qiterator.h \
-  /opt/homebrew/opt/qt/include/QtCore/qbytearraylist.h \
-  /opt/homebrew/opt/qt/include/QtCore/qstringlist.h \
-  /opt/homebrew/opt/qt/include/QtCore/qalgorithms.h \
-  /opt/homebrew/opt/qt/include/QtCore/qstringmatcher.h \
-  /opt/homebrew/opt/qt/include/QtCore/qscopedpointer.h \
-  /opt/homebrew/opt/qt/include/QtCore/qmetatype.h \
-  /opt/homebrew/opt/qt/include/QtCore/qdatastream.h \
-  /opt/homebrew/opt/qt/include/QtCore/qiodevicebase.h \
-  /opt/homebrew/opt/qt/include/QtCore/qfloat16.h \
-  /opt/homebrew/opt/qt/include/QtCore/qmath.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtformat_impl.h \
-  /opt/homebrew/opt/qt/include/QtCore/qiterable.h \
-  /opt/homebrew/opt/qt/include/QtCore/qmetacontainer.h \
-  /opt/homebrew/opt/qt/include/QtCore/qcontainerinfo.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtaggedpointer.h \
-  /opt/homebrew/opt/qt/include/QtCore/qscopeguard.h \
+  /usr/local/include/QtCore/qiterator.h \
+  /usr/local/include/QtCore/qbytearraylist.h \
+  /usr/local/include/QtCore/qstringlist.h \
+  /usr/local/include/QtCore/qalgorithms.h \
+  /usr/local/include/QtCore/qstringmatcher.h \
+  /usr/local/include/QtCore/qscopedpointer.h \
+  /usr/local/include/QtCore/qmetatype.h \
+  /usr/local/include/QtCore/qdatastream.h \
+  /usr/local/include/QtCore/qiodevicebase.h \
+  /usr/local/include/QtCore/qfloat16.h /usr/local/include/QtCore/qmath.h \
+  /usr/local/include/QtCore/qtformat_impl.h \
+  /usr/local/include/QtCore/qiterable.h \
+  /usr/local/include/QtCore/qmetacontainer.h \
+  /usr/local/include/QtCore/qcontainerinfo.h \
+  /usr/local/include/QtCore/qtaggedpointer.h \
+  /usr/local/include/QtCore/qscopeguard.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/list \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/map \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__tree \
-  /opt/homebrew/opt/qt/include/QtCore/qobject_impl.h \
-  /opt/homebrew/opt/qt/include/QtCore/qbindingstorage.h \
+  /usr/local/include/QtCore/qobject_impl.h \
+  /usr/local/include/QtCore/qbindingstorage.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/chrono \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/calendar.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/convert_to_tm.h \
@@ -1083,113 +1080,102 @@ CMakeFiles/TimeTracker.dir/main.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/year_month_weekday.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/literals.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/forward_list \
-  /opt/homebrew/opt/qt/include/QtCore/qeventloop.h \
-  /opt/homebrew/opt/qt/include/QtCore/qdeadlinetimer.h \
-  /opt/homebrew/opt/qt/include/QtCore/qelapsedtimer.h \
-  /opt/homebrew/opt/qt/include/QtCore/qnativeinterface.h \
-  /opt/homebrew/opt/qt/include/QtCore/qcoreapplication_platform.h \
-  /opt/homebrew/opt/qt/include/QtGui/qwindowdefs.h \
-  /opt/homebrew/opt/qt/include/QtCore/qpoint.h \
-  /opt/homebrew/opt/qt/include/QtCore/q23utility.h \
-  /opt/homebrew/opt/qt/include/QtCore/q20utility.h \
-  /opt/homebrew/opt/qt/include/QtCore/qsize.h \
-  /opt/homebrew/opt/qt/include/QtCore/qmargins.h \
-  /opt/homebrew/opt/qt/include/QtGui/qcursor.h \
-  /opt/homebrew/opt/qt/include/QtGui/qbitmap.h \
-  /opt/homebrew/opt/qt/include/QtGui/qpixmap.h \
-  /opt/homebrew/opt/qt/include/QtGui/qpaintdevice.h \
-  /opt/homebrew/opt/qt/include/QtCore/qrect.h \
-  /opt/homebrew/opt/qt/include/QtGui/qcolor.h \
-  /opt/homebrew/opt/qt/include/QtGui/qrgb.h \
-  /opt/homebrew/opt/qt/include/QtGui/qrgba64.h \
-  /opt/homebrew/opt/qt/include/QtCore/qshareddata.h \
-  /opt/homebrew/opt/qt/include/QtGui/qimage.h \
-  /opt/homebrew/opt/qt/include/QtGui/qpixelformat.h \
-  /opt/homebrew/opt/qt/include/QtGui/qtransform.h \
-  /opt/homebrew/opt/qt/include/QtGui/qpolygon.h \
-  /opt/homebrew/opt/qt/include/QtGui/qregion.h \
-  /opt/homebrew/opt/qt/include/QtCore/qspan.h \
+  /usr/local/include/QtCore/qeventloop.h \
+  /usr/local/include/QtCore/qdeadlinetimer.h \
+  /usr/local/include/QtCore/qelapsedtimer.h \
+  /usr/local/include/QtCore/qnativeinterface.h \
+  /usr/local/include/QtCore/qcoreapplication_platform.h \
+  /usr/local/include/QtGui/qwindowdefs.h \
+  /usr/local/include/QtCore/qpoint.h \
+  /usr/local/include/QtCore/q23utility.h \
+  /usr/local/include/QtCore/q20utility.h \
+  /usr/local/include/QtCore/qsize.h /usr/local/include/QtCore/qmargins.h \
+  /usr/local/include/QtGui/qcursor.h /usr/local/include/QtGui/qbitmap.h \
+  /usr/local/include/QtGui/qpixmap.h \
+  /usr/local/include/QtGui/qpaintdevice.h \
+  /usr/local/include/QtCore/qrect.h /usr/local/include/QtGui/qcolor.h \
+  /usr/local/include/QtGui/qrgb.h /usr/local/include/QtGui/qrgba64.h \
+  /usr/local/include/QtCore/qshareddata.h \
+  /usr/local/include/QtGui/qimage.h \
+  /usr/local/include/QtGui/qpixelformat.h \
+  /usr/local/include/QtGui/qtransform.h \
+  /usr/local/include/QtGui/qpolygon.h /usr/local/include/QtGui/qregion.h \
+  /usr/local/include/QtCore/qspan.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/cassert \
-  /opt/homebrew/opt/qt/include/QtCore/q20iterator.h \
-  /opt/homebrew/opt/qt/include/QtCore/qline.h \
-  /opt/homebrew/opt/qt/include/QtGui/qguiapplication.h \
-  /opt/homebrew/opt/qt/include/QtGui/qinputmethod.h \
-  /opt/homebrew/opt/qt/include/QtCore/qlocale.h \
-  /opt/homebrew/opt/qt/include/QtCore/qvariant.h \
-  /opt/homebrew/opt/qt/include/QtCore/qdebug.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtextstream.h \
-  /opt/homebrew/opt/qt/include/QtCore/qcontiguouscache.h \
-  /opt/homebrew/opt/qt/include/QtCore/qsharedpointer.h \
-  /opt/homebrew/opt/qt/include/QtCore/qsharedpointer_impl.h \
+  /usr/local/include/QtCore/q20iterator.h \
+  /usr/local/include/QtCore/qline.h \
+  /usr/local/include/QtGui/qguiapplication.h \
+  /usr/local/include/QtGui/qinputmethod.h \
+  /usr/local/include/QtCore/qlocale.h \
+  /usr/local/include/QtCore/qvariant.h \
+  /usr/local/include/QtCore/qdebug.h \
+  /usr/local/include/QtCore/qtextstream.h \
+  /usr/local/include/QtCore/qcontiguouscache.h \
+  /usr/local/include/QtCore/qsharedpointer.h \
+  /usr/local/include/QtCore/qsharedpointer_impl.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/set \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/unordered_set \
-  /opt/homebrew/opt/qt/include/QtCore/qmap.h \
-  /opt/homebrew/opt/qt/include/QtCore/qshareddata_impl.h \
-  /opt/homebrew/opt/qt/include/QtCore/qset.h \
-  /opt/homebrew/opt/qt/include/QtCore/qhash.h \
-  /opt/homebrew/opt/qt/include/QtCore/qvarlengtharray.h \
-  /opt/homebrew/opt/qt/include/QtGui/qguiapplication_platform.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/QPushButton \
-  /opt/homebrew/opt/qt/include/QtWidgets/qpushbutton.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qabstractbutton.h \
-  /opt/homebrew/opt/qt/include/QtGui/qicon.h \
-  /opt/homebrew/opt/qt/include/QtGui/qkeysequence.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qwidget.h \
-  /opt/homebrew/opt/qt/include/QtGui/qaction.h \
-  /opt/homebrew/opt/qt/include/QtGui/qpalette.h \
-  /opt/homebrew/opt/qt/include/QtGui/qbrush.h \
-  /opt/homebrew/opt/qt/include/QtGui/qfont.h \
-  /opt/homebrew/opt/qt/include/QtCore/qendian.h \
-  /opt/homebrew/opt/qt/include/QtGui/qfontmetrics.h \
-  /opt/homebrew/opt/qt/include/QtGui/qfontinfo.h \
-  /opt/homebrew/opt/qt/include/QtGui/qfontvariableaxis.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qsizepolicy.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/QWidget \
-  /opt/homebrew/opt/qt/include/QtWidgets/QVBoxLayout \
-  /opt/homebrew/opt/qt/include/QtWidgets/qboxlayout.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qlayout.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qlayoutitem.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qgridlayout.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/QHBoxLayout \
-  /opt/homebrew/opt/qt/include/QtWidgets/QComboBox \
-  /opt/homebrew/opt/qt/include/QtWidgets/qcombobox.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qabstractitemdelegate.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qstyleoption.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qabstractspinbox.h \
-  /opt/homebrew/opt/qt/include/QtGui/qvalidator.h \
-  /opt/homebrew/opt/qt/include/QtCore/qregularexpression.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qslider.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qabstractslider.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qstyle.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qtabbar.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qtabwidget.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qrubberband.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qframe.h \
-  /opt/homebrew/opt/qt/include/QtCore/qabstractitemmodel.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/QLineEdit \
-  /opt/homebrew/opt/qt/include/QtWidgets/qlineedit.h \
-  /opt/homebrew/opt/qt/include/QtGui/qtextcursor.h \
-  /opt/homebrew/opt/qt/include/QtGui/qtextdocument.h \
-  /opt/homebrew/opt/qt/include/QtCore/qurl.h \
-  /opt/homebrew/opt/qt/include/QtGui/qtextformat.h \
-  /opt/homebrew/opt/qt/include/QtGui/qpen.h \
-  /opt/homebrew/opt/qt/include/QtGui/qtextoption.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/QDialog \
-  /opt/homebrew/opt/qt/include/QtWidgets/qdialog.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/QDialogButtonBox \
-  /opt/homebrew/opt/qt/include/QtWidgets/qdialogbuttonbox.h \
-  /opt/homebrew/opt/qt/include/QtCore/QTimer \
-  /opt/homebrew/opt/qt/include/QtCore/qtimer.h \
-  /opt/homebrew/opt/qt/include/QtCore/QStandardPaths \
-  /opt/homebrew/opt/qt/include/QtCore/qstandardpaths.h \
-  /opt/homebrew/opt/qt/include/QtCore/QDir \
-  /opt/homebrew/opt/qt/include/QtCore/qdir.h \
-  /opt/homebrew/opt/qt/include/QtCore/qdirlisting.h \
-  /opt/homebrew/opt/qt/include/QtCore/qfiledevice.h \
-  /opt/homebrew/opt/qt/include/QtCore/qiodevice.h \
-  /opt/homebrew/opt/qt/include/QtCore/qdatetime.h \
-  /opt/homebrew/opt/qt/include/QtCore/qcalendar.h \
-  /opt/homebrew/opt/qt/include/QtCore/qfile.h \
+  /usr/local/include/QtCore/qmap.h \
+  /usr/local/include/QtCore/qshareddata_impl.h \
+  /usr/local/include/QtCore/qset.h /usr/local/include/QtCore/qhash.h \
+  /usr/local/include/QtCore/qvarlengtharray.h \
+  /usr/local/include/QtGui/qguiapplication_platform.h \
+  /usr/local/include/QtWidgets/QPushButton \
+  /usr/local/include/QtWidgets/qpushbutton.h \
+  /usr/local/include/QtWidgets/qabstractbutton.h \
+  /usr/local/include/QtGui/qicon.h \
+  /usr/local/include/QtGui/qkeysequence.h \
+  /usr/local/include/QtWidgets/qwidget.h \
+  /usr/local/include/QtGui/qaction.h /usr/local/include/QtGui/qpalette.h \
+  /usr/local/include/QtGui/qbrush.h /usr/local/include/QtGui/qfont.h \
+  /usr/local/include/QtCore/qendian.h \
+  /usr/local/include/QtGui/qfontmetrics.h \
+  /usr/local/include/QtGui/qfontinfo.h \
+  /usr/local/include/QtGui/qfontvariableaxis.h \
+  /usr/local/include/QtWidgets/qsizepolicy.h \
+  /usr/local/include/QtWidgets/QWidget \
+  /usr/local/include/QtWidgets/QVBoxLayout \
+  /usr/local/include/QtWidgets/qboxlayout.h \
+  /usr/local/include/QtWidgets/qlayout.h \
+  /usr/local/include/QtWidgets/qlayoutitem.h \
+  /usr/local/include/QtWidgets/qgridlayout.h \
+  /usr/local/include/QtWidgets/QHBoxLayout \
+  /usr/local/include/QtWidgets/QComboBox \
+  /usr/local/include/QtWidgets/qcombobox.h \
+  /usr/local/include/QtWidgets/qabstractitemdelegate.h \
+  /usr/local/include/QtWidgets/qstyleoption.h \
+  /usr/local/include/QtWidgets/qabstractspinbox.h \
+  /usr/local/include/QtGui/qvalidator.h \
+  /usr/local/include/QtCore/qregularexpression.h \
+  /usr/local/include/QtWidgets/qslider.h \
+  /usr/local/include/QtWidgets/qabstractslider.h \
+  /usr/local/include/QtWidgets/qstyle.h \
+  /usr/local/include/QtWidgets/qtabbar.h \
+  /usr/local/include/QtWidgets/qtabwidget.h \
+  /usr/local/include/QtWidgets/qrubberband.h \
+  /usr/local/include/QtWidgets/qframe.h \
+  /usr/local/include/QtCore/qabstractitemmodel.h \
+  /usr/local/include/QtWidgets/QLineEdit \
+  /usr/local/include/QtWidgets/qlineedit.h \
+  /usr/local/include/QtGui/qtextcursor.h \
+  /usr/local/include/QtGui/qtextdocument.h \
+  /usr/local/include/QtCore/qurl.h \
+  /usr/local/include/QtGui/qtextformat.h /usr/local/include/QtGui/qpen.h \
+  /usr/local/include/QtGui/qtextoption.h \
+  /usr/local/include/QtWidgets/QDialog \
+  /usr/local/include/QtWidgets/qdialog.h \
+  /usr/local/include/QtWidgets/QDialogButtonBox \
+  /usr/local/include/QtWidgets/qdialogbuttonbox.h \
+  /usr/local/include/QtCore/QTimer /usr/local/include/QtCore/qtimer.h \
+  /usr/local/include/QtCore/QStandardPaths \
+  /usr/local/include/QtCore/qstandardpaths.h \
+  /usr/local/include/QtCore/QDir /usr/local/include/QtCore/qdir.h \
+  /usr/local/include/QtCore/qdirlisting.h \
+  /usr/local/include/QtCore/qfiledevice.h \
+  /usr/local/include/QtCore/qiodevice.h \
+  /usr/local/include/QtCore/qdatetime.h \
+  /usr/local/include/QtCore/qcalendar.h \
+  /usr/local/include/QtCore/qfile.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/filesystem \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__filesystem/copy_options.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__filesystem/directory_entry.h \
@@ -1235,42 +1221,39 @@ CMakeFiles/TimeTracker.dir/main.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__filesystem/path_iterator.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__filesystem/recursive_directory_iterator.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__filesystem/u8path.h \
-  /opt/homebrew/opt/qt/include/QtCore/qfileinfo.h \
-  /opt/homebrew/opt/qt/include/QtCore/qtimezone.h \
-  /opt/homebrew/opt/qt/include/QtCore/QJsonDocument \
-  /opt/homebrew/opt/qt/include/QtCore/qjsondocument.h \
-  /opt/homebrew/opt/qt/include/QtCore/qjsonparseerror.h \
-  /opt/homebrew/opt/qt/include/QtCore/QJsonObject \
-  /opt/homebrew/opt/qt/include/QtCore/qjsonobject.h \
-  /opt/homebrew/opt/qt/include/QtCore/qjsonvalue.h \
-  /opt/homebrew/opt/qt/include/QtCore/qcborvalue.h \
-  /opt/homebrew/opt/qt/include/QtCore/qcborcommon.h \
-  /opt/homebrew/opt/qt/include/QtCore/quuid.h \
-  /opt/homebrew/opt/qt/include/QtCore/QLockFile \
-  /opt/homebrew/opt/qt/include/QtCore/qlockfile.h \
-  /opt/homebrew/opt/qt/include/QtGui/QPainter \
-  /opt/homebrew/opt/qt/include/QtGui/qpainter.h \
-  /opt/homebrew/opt/qt/include/QtGui/QPen \
-  /opt/homebrew/opt/qt/include/QtGui/QColor \
-  /opt/homebrew/opt/qt/include/QtMultimedia/QMediaPlayer \
-  /opt/homebrew/opt/qt/include/QtMultimedia/qmediaplayer.h \
-  /opt/homebrew/opt/qt/include/QtMultimedia/qtmultimediaglobal.h \
-  /opt/homebrew/opt/qt/include/QtMultimedia/qtmultimedia-config.h \
-  /opt/homebrew/opt/qt/include/QtMultimedia/qtmultimediaexports.h \
-  /opt/homebrew/opt/qt/include/QtMultimedia/qtaudio.h \
-  /opt/homebrew/opt/qt/include/QtMultimedia/qaudio.h \
-  /opt/homebrew/opt/qt/include/QtMultimedia/QAudioOutput \
-  /opt/homebrew/opt/qt/include/QtMultimedia/qaudiooutput.h \
-  /opt/homebrew/opt/qt/include/QtSql/QSqlDatabase \
-  /opt/homebrew/opt/qt/include/QtSql/qsqldatabase.h \
-  /opt/homebrew/opt/qt/include/QtSql/qtsqlglobal.h \
-  /opt/homebrew/opt/qt/include/QtSql/qtsql-config.h \
-  /opt/homebrew/opt/qt/include/QtSql/qtsqlexports.h \
-  /opt/homebrew/opt/qt/include/QtCore/qmetaobject.h \
-  /opt/homebrew/opt/qt/include/QtSql/QSqlQuery \
-  /opt/homebrew/opt/qt/include/QtSql/qsqlquery.h \
-  /opt/homebrew/opt/qt/include/QtSql/QSqlError \
-  /opt/homebrew/opt/qt/include/QtSql/qsqlerror.h \
+  /usr/local/include/QtCore/qfileinfo.h \
+  /usr/local/include/QtCore/qtimezone.h \
+  /usr/local/include/QtCore/QJsonDocument \
+  /usr/local/include/QtCore/qjsondocument.h \
+  /usr/local/include/QtCore/qjsonparseerror.h \
+  /usr/local/include/QtCore/QJsonObject \
+  /usr/local/include/QtCore/qjsonobject.h \
+  /usr/local/include/QtCore/qjsonvalue.h \
+  /usr/local/include/QtCore/qcborvalue.h \
+  /usr/local/include/QtCore/qcborcommon.h \
+  /usr/local/include/QtCore/quuid.h /usr/local/include/QtCore/QLockFile \
+  /usr/local/include/QtCore/qlockfile.h \
+  /usr/local/include/QtGui/QPainter /usr/local/include/QtGui/qpainter.h \
+  /usr/local/include/QtGui/QPen /usr/local/include/QtGui/QColor \
+  /usr/local/include/QtMultimedia/QMediaPlayer \
+  /usr/local/include/QtMultimedia/qmediaplayer.h \
+  /usr/local/include/QtMultimedia/qtmultimediaglobal.h \
+  /usr/local/include/QtMultimedia/qtmultimedia-config.h \
+  /usr/local/include/QtMultimedia/qtmultimediaexports.h \
+  /usr/local/include/QtMultimedia/qtaudio.h \
+  /usr/local/include/QtMultimedia/qaudio.h \
+  /usr/local/include/QtMultimedia/QAudioOutput \
+  /usr/local/include/QtMultimedia/qaudiooutput.h \
+  /usr/local/include/QtSql/QSqlDatabase \
+  /usr/local/include/QtSql/qsqldatabase.h \
+  /usr/local/include/QtSql/qtsqlglobal.h \
+  /usr/local/include/QtSql/qtsql-config.h \
+  /usr/local/include/QtSql/qtsqlexports.h \
+  /usr/local/include/QtCore/qmetaobject.h \
+  /usr/local/include/QtSql/QSqlQuery \
+  /usr/local/include/QtSql/qsqlquery.h \
+  /usr/local/include/QtSql/QSqlError \
+  /usr/local/include/QtSql/qsqlerror.h \
   /opt/homebrew/opt/qt/lib/QtCore.framework/Headers/QDateTime \
   /opt/homebrew/opt/qt/lib/QtCore.framework/Headers/qdatetime.h \
   /opt/homebrew/opt/qt/lib/QtCore.framework/Headers/QFile \
@@ -1281,19 +1264,16 @@ CMakeFiles/TimeTracker.dir/main.cpp.o: \
   /opt/homebrew/opt/qt/lib/QtCore.framework/Headers/qfileinfo.h \
   /opt/homebrew/opt/qt/lib/QtGui.framework/Headers/QMouseEvent \
   /opt/homebrew/opt/qt/lib/QtGui.framework/Headers/qevent.h \
-  /opt/homebrew/opt/qt/include/QtGui/qeventpoint.h \
-  /opt/homebrew/opt/qt/include/QtGui/qvector2d.h \
-  /opt/homebrew/opt/qt/include/QtGui/qvectornd.h \
-  /opt/homebrew/opt/qt/include/QtGui/qpointingdevice.h \
-  /opt/homebrew/opt/qt/include/QtGui/qinputdevice.h \
-  /opt/homebrew/opt/qt/include/QtGui/qscreen.h \
-  /opt/homebrew/opt/qt/include/QtCore/QList \
-  /opt/homebrew/opt/qt/include/QtCore/QObject \
-  /opt/homebrew/opt/qt/include/QtCore/QRect \
-  /opt/homebrew/opt/qt/include/QtCore/QSize \
-  /opt/homebrew/opt/qt/include/QtCore/QSizeF \
-  /opt/homebrew/opt/qt/include/QtGui/QTransform \
-  /opt/homebrew/opt/qt/include/QtGui/qscreen_platform.h \
+  /usr/local/include/QtGui/qeventpoint.h \
+  /usr/local/include/QtGui/qvector2d.h \
+  /usr/local/include/QtGui/qvectornd.h \
+  /usr/local/include/QtGui/qpointingdevice.h \
+  /usr/local/include/QtGui/qinputdevice.h \
+  /usr/local/include/QtGui/qscreen.h /usr/local/include/QtCore/QList \
+  /usr/local/include/QtCore/QObject /usr/local/include/QtCore/QRect \
+  /usr/local/include/QtCore/QSize /usr/local/include/QtCore/QSizeF \
+  /usr/local/include/QtGui/QTransform \
+  /usr/local/include/QtGui/qscreen_platform.h \
   /opt/homebrew/opt/qt/lib/QtGui.framework/Headers/QScreen \
   /opt/homebrew/opt/qt/lib/QtGui.framework/Headers/qscreen.h \
   /opt/homebrew/opt/qt/lib/QtGui.framework/Headers/QGuiApplication \
@@ -1312,27 +1292,26 @@ CMakeFiles/TimeTracker.dir/main.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_o_dsync.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_s_ifmt.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_filesec_t.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/QLabel \
-  /opt/homebrew/opt/qt/include/QtWidgets/qlabel.h \
-  /opt/homebrew/opt/qt/include/QtGui/qpicture.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/QMenuBar \
-  /opt/homebrew/opt/qt/include/QtWidgets/qmenubar.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qmenu.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/QMenu \
-  /opt/homebrew/opt/qt/include/QtWidgets/QScrollArea \
-  /opt/homebrew/opt/qt/include/QtWidgets/qscrollarea.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qabstractscrollarea.h \
-  /opt/homebrew/opt/qt/include/QtGui/QAction \
-  /opt/homebrew/opt/qt/include/QtWidgets/QSlider \
-  /opt/homebrew/opt/qt/include/QtWidgets/QListWidget \
-  /opt/homebrew/opt/qt/include/QtWidgets/qlistwidget.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qlistview.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/qabstractitemview.h \
-  /opt/homebrew/opt/qt/include/QtCore/qitemselectionmodel.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/QTabWidget \
-  /opt/homebrew/opt/qt/include/QtWidgets/QGroupBox \
-  /opt/homebrew/opt/qt/include/QtWidgets/qgroupbox.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/QSpinBox \
-  /opt/homebrew/opt/qt/include/QtWidgets/qspinbox.h \
-  /opt/homebrew/opt/qt/include/QtWidgets/QInputDialog \
-  /opt/homebrew/opt/qt/include/QtWidgets/qinputdialog.h
+  /usr/local/include/QtWidgets/QLabel \
+  /usr/local/include/QtWidgets/qlabel.h \
+  /usr/local/include/QtGui/qpicture.h \
+  /usr/local/include/QtWidgets/QMenuBar \
+  /usr/local/include/QtWidgets/qmenubar.h \
+  /usr/local/include/QtWidgets/qmenu.h \
+  /usr/local/include/QtWidgets/QMenu \
+  /usr/local/include/QtWidgets/QScrollArea \
+  /usr/local/include/QtWidgets/qscrollarea.h \
+  /usr/local/include/QtWidgets/qabstractscrollarea.h \
+  /usr/local/include/QtGui/QAction /usr/local/include/QtWidgets/QSlider \
+  /usr/local/include/QtWidgets/QListWidget \
+  /usr/local/include/QtWidgets/qlistwidget.h \
+  /usr/local/include/QtWidgets/qlistview.h \
+  /usr/local/include/QtWidgets/qabstractitemview.h \
+  /usr/local/include/QtCore/qitemselectionmodel.h \
+  /usr/local/include/QtWidgets/QTabWidget \
+  /usr/local/include/QtWidgets/QGroupBox \
+  /usr/local/include/QtWidgets/qgroupbox.h \
+  /usr/local/include/QtWidgets/QSpinBox \
+  /usr/local/include/QtWidgets/qspinbox.h \
+  /usr/local/include/QtWidgets/QInputDialog \
+  /usr/local/include/QtWidgets/qinputdialog.h
