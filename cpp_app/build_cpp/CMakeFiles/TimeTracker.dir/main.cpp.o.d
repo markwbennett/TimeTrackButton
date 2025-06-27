@@ -1314,4 +1314,8 @@ CMakeFiles/TimeTracker.dir/main.cpp.o: \
   /usr/local/include/QtWidgets/QSpinBox \
   /usr/local/include/QtWidgets/qspinbox.h \
   /usr/local/include/QtWidgets/QInputDialog \
-  /usr/local/include/QtWidgets/qinputdialog.h
+  /usr/local/include/QtWidgets/qinputdialog.h \
+  /usr/local/include/QtWidgets/QFileDialog \
+  /usr/local/include/QtWidgets/qfiledialog.h \
+  /usr/local/include/QtWidgets/QMessageBox \
+  /usr/local/include/QtWidgets/qmessagebox.h

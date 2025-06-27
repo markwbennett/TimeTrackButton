@@ -43,6 +43,8 @@
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QInputDialog>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMessageBox>
 
 class StateManager {
 public:
@@ -441,8 +443,39 @@ private:
                 dataFolder = file.readAll().trimmed();
             }
         } else {
-            // First run - use default location
-            dataFolder = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/TimeTracker";
+            // First run - prompt user to select data folder
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("IACLS Time Tracker - First Run Setup");
+            msgBox.setText("Welcome to IACLS Time Tracker!\n\nPlease choose a folder where your time tracking data will be saved.\n\nThis folder will contain:\n• Time tracking database\n• CSV exports\n• Configuration files");
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.exec();
+            
+            QString defaultLocation = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/TimeTracker";
+            dataFolder = QFileDialog::getExistingDirectory(
+                nullptr,
+                "Select Data Folder for Time Tracker",
+                QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
+                QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
+            );
+            
+            // If user cancelled, use default location
+            if (dataFolder.isEmpty()) {
+                dataFolder = defaultLocation;
+                QMessageBox::information(
+                    nullptr,
+                    "Default Location Selected",
+                    QString("Using default location:\n%1").arg(dataFolder)
+                );
+            } else {
+                // Append TimeTracker subfolder to selected directory
+                dataFolder = dataFolder + "/TimeTracker";
+                QMessageBox::information(
+                    nullptr,
+                    "Data Folder Selected",
+                    QString("Time tracking data will be saved to:\n%1").arg(dataFolder)
+                );
+            }
+            
             // Create config directory and save choice
             QDir().mkpath(configInfo.absolutePath());
             QFile file(configFile);
