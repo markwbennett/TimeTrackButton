@@ -2,12 +2,14 @@
 
 APP_PATH="TimeTracker_CPP.app"
 LIBS_PATH="$APP_PATH/Contents/Libraries"
+PLUGINS_PATH="$APP_PATH/Contents/PlugIns"
 BINARY_PATH="$APP_PATH/Contents/MacOS/TimeTracker"
 
 echo "🔧 Creating minimal Qt bundle..."
 
-# Create Libraries directory
+# Create Libraries and PlugIns directories
 mkdir -p "$LIBS_PATH"
+mkdir -p "$PLUGINS_PATH/platforms"
 
 # Qt libraries we need (just the dylib files)
 QT_LIBS=(
@@ -28,6 +30,29 @@ for lib in "${QT_LIBS[@]}"; do
         chmod 755 "$LIBS_PATH/lib${lib}.dylib"
     fi
 done
+
+# Copy essential Qt plugins
+echo "📦 Copying Qt plugins..."
+PLUGIN_SOURCES=(
+    "/opt/homebrew/opt/qt/share/qt/plugins/platforms/libqcocoa.dylib"
+)
+
+for plugin_src in "${PLUGIN_SOURCES[@]}"; do
+    if [ -f "$plugin_src" ]; then
+        plugin_name=$(basename "$plugin_src")
+        echo "  Copying $plugin_name..."
+        cp "$plugin_src" "$PLUGINS_PATH/platforms/"
+        chmod 755 "$PLUGINS_PATH/platforms/$plugin_name"
+    fi
+done
+
+# Create qt.conf to tell Qt where to find plugins and libraries
+echo "📝 Creating qt.conf..."
+cat > "$APP_PATH/Contents/Resources/qt.conf" << EOF
+[Paths]
+Plugins = PlugIns
+Libraries = Libraries
+EOF
 
 echo "🔗 Updating library paths..."
 
@@ -52,6 +77,21 @@ for lib in "${QT_LIBS[@]}"; do
     done
 done
 
+# Update plugin dependencies
+echo "🔗 Updating plugin paths..."
+for plugin_file in "$PLUGINS_PATH/platforms"/*.dylib; do
+    if [ -f "$plugin_file" ]; then
+        plugin_name=$(basename "$plugin_file")
+        echo "  Updating $plugin_name..."
+        
+        for lib in "${QT_LIBS[@]}"; do
+            old_path="/opt/homebrew/opt/qt/lib/${lib}.framework/Versions/A/${lib}"
+            new_path="@executable_path/../Libraries/lib${lib}.dylib"
+            install_name_tool -change "$old_path" "$new_path" "$plugin_file" 2>/dev/null
+        done
+    fi
+done
+
 echo "🧹 Stripping debug symbols..."
 for lib in "${QT_LIBS[@]}"; do
     lib_file="$LIBS_PATH/lib${lib}.dylib"
@@ -60,16 +100,32 @@ for lib in "${QT_LIBS[@]}"; do
     fi
 done
 
+# Strip plugins
+for plugin_file in "$PLUGINS_PATH/platforms"/*.dylib; do
+    if [ -f "$plugin_file" ]; then
+        strip -x "$plugin_file" 2>/dev/null
+    fi
+done
+
 # Strip the main binary
 strip -x "$BINARY_PATH" 2>/dev/null
 
-echo "🔐 Code signing all libraries..."
+echo "🔐 Code signing all libraries and plugins..."
 # Sign each Qt library
 for lib in "${QT_LIBS[@]}"; do
     lib_file="$LIBS_PATH/lib${lib}.dylib"
     if [ -f "$lib_file" ]; then
         echo "  Signing lib${lib}.dylib..."
         codesign --force --sign - "$lib_file" 2>/dev/null
+    fi
+done
+
+# Sign plugins
+for plugin_file in "$PLUGINS_PATH/platforms"/*.dylib; do
+    if [ -f "$plugin_file" ]; then
+        plugin_name=$(basename "$plugin_file")
+        echo "  Signing $plugin_name..."
+        codesign --force --sign - "$plugin_file" 2>/dev/null
     fi
 done
 
