@@ -63,7 +63,25 @@ done
 # Strip the main binary
 strip -x "$BINARY_PATH" 2>/dev/null
 
+echo "🔐 Code signing all libraries..."
+# Sign each Qt library
+for lib in "${QT_LIBS[@]}"; do
+    lib_file="$LIBS_PATH/lib${lib}.dylib"
+    if [ -f "$lib_file" ]; then
+        echo "  Signing lib${lib}.dylib..."
+        codesign --force --sign - "$lib_file" 2>/dev/null
+    fi
+done
+
+# Sign the main binary
+echo "  Signing main binary..."
+codesign --force --sign - "$BINARY_PATH" 2>/dev/null
+
+# Sign the entire app bundle with --deep to ensure all components are signed
+echo "  Signing app bundle..."
+codesign --force --deep --sign - "$APP_PATH" 2>/dev/null
+
 echo "📊 Bundle size:"
 du -sh "$APP_PATH"
 
-echo "✅ Minimal Qt bundle created!" 
+echo "✅ Minimal Qt bundle created and signed!" 
