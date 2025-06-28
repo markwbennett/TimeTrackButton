@@ -6,7 +6,7 @@ CXX_DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_MULTIMEDIA_LIB -DQT_NETWORK_LIB -D
 
 CXX_INCLUDES = -I/Users/markbennett/github/TimeTrackButton/cpp_app/build_cpp/TimeTracker_autogen/include -isystem /opt/homebrew/opt/qt/lib/QtCore.framework/Headers -iframework /opt/homebrew/opt/qt/lib -isystem /opt/homebrew/opt/qt/share/qt/mkspecs/macx-clang -isystem /opt/homebrew/opt/qt/include -isystem /opt/homebrew/opt/qt/lib/QtWidgets.framework/Headers -isystem /opt/homebrew/opt/qt/lib/QtGui.framework/Headers -isystem /opt/homebrew/opt/qt/lib/QtSql.framework/Headers -isystem /opt/homebrew/opt/qt/lib/QtMultimedia.framework/Headers -isystem /opt/homebrew/opt/qt/lib/QtNetwork.framework/Headers
 
-CXX_FLAGSarm64 = -O3 -DNDEBUG -flto -std=gnu++17 -arch arm64
+CXX_FLAGSarm64 = -O3 -DNDEBUG -flto -ffunction-sections -fdata-sections -std=gnu++17 -arch arm64
 
-CXX_FLAGS = -O3 -DNDEBUG -flto -std=gnu++17 -arch arm64
+CXX_FLAGS = -O3 -DNDEBUG -flto -ffunction-sections -fdata-sections -std=gnu++17 -arch arm64
 

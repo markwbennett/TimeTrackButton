@@ -433,6 +433,14 @@ protected:
 
 private:
     QString getDataFolder() {
+        static QString cachedDataFolder;
+        static bool hasPrompted = false;
+        
+        // Return cached value if already determined
+        if (!cachedDataFolder.isEmpty()) {
+            return cachedDataFolder;
+        }
+        
         QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/config";
         QFileInfo configInfo(configFile);
         
@@ -442,8 +450,10 @@ private:
             if (file.open(QIODevice::ReadOnly)) {
                 dataFolder = file.readAll().trimmed();
             }
-        } else {
-            // First run - prompt user to select data folder
+        } else if (!hasPrompted) {
+            // First run - prompt user to select data folder (only once)
+            hasPrompted = true;
+            
             QMessageBox msgBox;
             msgBox.setWindowTitle("IACLS Time Tracker - First Run Setup");
             msgBox.setText("Welcome to IACLS Time Tracker!\n\nPlease choose a folder where your time tracking data will be saved.\n\nThis folder will contain:\n• Time tracking database\n• CSV exports\n• Configuration files");
@@ -467,8 +477,7 @@ private:
                     QString("Using default location:\n%1").arg(dataFolder)
                 );
             } else {
-                // Append TimeTracker subfolder to selected directory
-                dataFolder = dataFolder + "/TimeTracker";
+                // Use selected directory directly
                 QMessageBox::information(
                     nullptr,
                     "Data Folder Selected",
@@ -482,10 +491,16 @@ private:
             if (file.open(QIODevice::WriteOnly)) {
                 file.write(dataFolder.toUtf8());
             }
+        } else {
+            // Fallback to default if prompting was skipped
+            dataFolder = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/TimeTracker";
         }
         
         // Ensure data directory exists
         QDir().mkpath(dataFolder);
+        
+        // Cache the result
+        cachedDataFolder = dataFolder;
         return dataFolder;
     }
     
@@ -952,6 +967,10 @@ public:
             audioOutput->setVolume(volumePercent / 100.0);
         }
     }
+    
+    QString getCurrentDataFolder() const {
+        return dataFolder;
+    }
 
 private:
     
@@ -1205,6 +1224,34 @@ public:
         
         tabs->addTab(activitiesTab, "Activities");
         
+        // Data Folder tab
+        auto* dataTab = new QWidget();
+        auto* dataLayout = new QVBoxLayout(dataTab);
+        
+        auto* dataGroup = new QGroupBox("Data Storage Location", dataTab);
+        auto* dataGroupLayout = new QVBoxLayout(dataGroup);
+        
+        auto* currentFolderLabel = new QLabel("Current data folder:", dataGroup);
+        currentFolderPath = new QLabel(floatingButton->getCurrentDataFolder(), dataGroup);
+        currentFolderPath->setWordWrap(true);
+        currentFolderPath->setStyleSheet("QLabel { background-color: #f0f0f0; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }");
+        
+        auto* changeFolderBtn = new QPushButton("Change Data Folder...", dataGroup);
+        connect(changeFolderBtn, &QPushButton::clicked, this, &PreferencesDialog::changeDataFolder);
+        
+        auto* infoLabel = new QLabel("Note: Changing the data folder will require restarting the application. Your existing data will remain in the old location.", dataGroup);
+        infoLabel->setWordWrap(true);
+        infoLabel->setStyleSheet("color: #666; font-size: 11px;");
+        
+        dataGroupLayout->addWidget(currentFolderLabel);
+        dataGroupLayout->addWidget(currentFolderPath);
+        dataGroupLayout->addWidget(changeFolderBtn);
+        dataGroupLayout->addWidget(infoLabel);
+        dataLayout->addWidget(dataGroup);
+        dataLayout->addStretch();
+        
+        tabs->addTab(dataTab, "Data Folder");
+        
         layout->addWidget(tabs);
         
         // Dialog buttons
@@ -1277,6 +1324,48 @@ private slots:
         auto* item = activitiesList->currentItem();
         if (item) {
             delete activitiesList->takeItem(activitiesList->row(item));
+        }
+    }
+    
+    void changeDataFolder() {
+        QString currentFolder = floatingButton->getCurrentDataFolder();
+        QString parentFolder = QFileInfo(currentFolder).absolutePath();
+        
+        QString newFolder = QFileDialog::getExistingDirectory(
+            this,
+            "Select New Data Folder",
+            parentFolder,
+            QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
+        );
+        
+        if (!newFolder.isEmpty() && newFolder != currentFolder) {
+            // Use selected directory directly
+            
+            // Update the config file
+            QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/config";
+            QFileInfo configInfo(configFile);
+            QDir().mkpath(configInfo.absolutePath());
+            
+            QFile file(configFile);
+            if (file.open(QIODevice::WriteOnly)) {
+                file.write(newFolder.toUtf8());
+                
+                // Update the display
+                currentFolderPath->setText(newFolder);
+                
+                // Show confirmation
+                QMessageBox::information(
+                    this,
+                    "Data Folder Changed",
+                    QString("Data folder has been changed to:\n%1\n\nPlease restart the application for the change to take effect.").arg(newFolder)
+                );
+            } else {
+                QMessageBox::warning(
+                    this,
+                    "Error",
+                    "Failed to save the new data folder location."
+                );
+            }
         }
     }
     
@@ -1405,6 +1494,7 @@ private:
     QSlider* volumeSlider;
     QListWidget* projectsList;
     QListWidget* activitiesList;
+    QLabel* currentFolderPath;
     FloatingButton* floatingButton;
 };
 
