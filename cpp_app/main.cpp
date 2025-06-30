@@ -261,47 +261,24 @@ public:
 
 private:
     QStringList loadCustomActivities() {
-        try {
-            QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/custom_activities";
-            QFile file(configFile);
-            QStringList activities;
-            if (file.exists() && file.open(QIODevice::ReadOnly)) {
-                QTextStream in(&file);
-                while (!in.atEnd()) {
-                    QString line = in.readLine().trimmed();
-                    if (!line.isEmpty()) {
-                        activities.append(line);
-                    }
-                }
+        QStringList activities;
+        QSqlDatabase db = QSqlDatabase::database();
+        if (db.isValid()) {
+            QSqlQuery query("SELECT name FROM activities WHERE is_custom = 1 ORDER BY name");
+            while (query.next()) {
+                activities.append(query.value(0).toString());
             }
-            return activities;
-        } catch (...) {
-            return QStringList();
         }
+        return activities;
     }
     
     void saveCustomActivity(const QString& activity) {
-        try {
-            QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/custom_activities";
-            QFileInfo configInfo(configFile);
-            QDir().mkpath(configInfo.absolutePath());
-            
-            // Load existing activities
-            QStringList existing = loadCustomActivities();
-            
-            // Add new activity if not already present
-            if (!existing.contains(activity)) {
-                existing.append(activity);
-                QFile file(configFile);
-                if (file.open(QIODevice::WriteOnly)) {
-                    QTextStream out(&file);
-                    for (const QString& act : existing) {
-                        out << act << "\n";
-                    }
-                }
-            }
-        } catch (...) {
-            // Handle errors silently
+        QSqlDatabase db = QSqlDatabase::database();
+        if (db.isValid() && !activity.isEmpty()) {
+            QSqlQuery query;
+            query.prepare("INSERT OR IGNORE INTO activities (name, is_custom) VALUES (?, 1)");
+            query.addBindValue(activity);
+            query.exec();
         }
     }
 
@@ -650,6 +627,7 @@ private:
         }
         
         QSqlQuery query;
+        // Create time_entries table
         query.exec("CREATE TABLE IF NOT EXISTS time_entries ("
                   "id INTEGER PRIMARY KEY,"
                   "project TEXT,"
@@ -658,7 +636,34 @@ private:
                   "end_time INTEGER"
                   ")");
         
-        // Add activity column if it doesn't exist (for existing databases)
+        // Create projects table
+        query.exec("CREATE TABLE IF NOT EXISTS projects ("
+                  "id INTEGER PRIMARY KEY,"
+                  "name TEXT UNIQUE,"
+                  "created_at INTEGER DEFAULT (strftime('%s','now'))"
+                  ")");
+        
+        // Create activities table  
+        query.exec("CREATE TABLE IF NOT EXISTS activities ("
+                  "id INTEGER PRIMARY KEY,"
+                  "name TEXT UNIQUE,"
+                  "is_custom INTEGER DEFAULT 1,"
+                  "created_at INTEGER DEFAULT (strftime('%s','now'))"
+                  ")");
+        
+        // Insert default activities if they don't exist
+        QStringList defaultActivities = {
+            "Legal research", "Investigation", "Discovery Review",
+            "File Review", "Client Communication"
+        };
+        
+        for (const QString& activity : defaultActivities) {
+            query.prepare("INSERT OR IGNORE INTO activities (name, is_custom) VALUES (?, 0)");
+            query.addBindValue(activity);
+            query.exec();
+        }
+        
+        // Add activity column to time_entries if it doesn't exist (for existing databases)
         query.exec("ALTER TABLE time_entries ADD COLUMN activity TEXT");
     }
     
@@ -725,10 +730,28 @@ private:
     
     QStringList getProjects() {
         QStringList projects;
-        QSqlQuery query("SELECT DISTINCT project FROM time_entries WHERE project NOT LIKE '[HIDDEN]%' ORDER BY project");
+        
+        // Get projects from the projects table first
+        QSqlQuery query("SELECT name FROM projects ORDER BY name");
         while (query.next()) {
             projects << query.value(0).toString();
         }
+        
+        // Also get any projects from time_entries that aren't in projects table
+        query.exec("SELECT DISTINCT project FROM time_entries WHERE project NOT LIKE '[HIDDEN]%' AND project NOT IN (SELECT name FROM projects) ORDER BY project");
+        while (query.next()) {
+            QString project = query.value(0).toString();
+            if (!project.isEmpty()) {
+                projects << project;
+                // Add to projects table for future reference
+                QSqlQuery insertQuery;
+                insertQuery.prepare("INSERT OR IGNORE INTO projects (name) VALUES (?)");
+                insertQuery.addBindValue(project);
+                insertQuery.exec();
+            }
+        }
+        
+        projects.removeDuplicates();
         return projects;
     }
     
@@ -739,8 +762,27 @@ private:
             isTracking = true;
             startTime = QDateTime::currentDateTime();
             
-            // Insert into database
+            // Add project to projects table if it doesn't exist
             QSqlQuery query;
+            query.prepare("INSERT OR IGNORE INTO projects (name) VALUES (?)");
+            query.addBindValue(project);
+            query.exec();
+            
+            // Add activity to activities table if it doesn't exist (as custom)
+            if (activity != "Other") {
+                QStringList defaultActivities = {
+                    "Legal research", "Investigation", "Discovery Review",
+                    "File Review", "Client Communication"
+                };
+                
+                if (!defaultActivities.contains(activity)) {
+                    query.prepare("INSERT OR IGNORE INTO activities (name, is_custom) VALUES (?, 1)");
+                    query.addBindValue(activity);
+                    query.exec();
+                }
+            }
+            
+            // Insert into time_entries
             query.prepare("INSERT INTO time_entries (project, activity, start_time) VALUES (?, ?, ?)");
             query.addBindValue(project);
             query.addBindValue(activity);
@@ -1370,76 +1412,59 @@ private slots:
     }
     
     void loadProjects() {
-        // Load projects from database (same as getProjects() method)
+        // Load projects from database
         QSqlDatabase db = QSqlDatabase::database();
         if (db.isValid()) {
-            QSqlQuery query("SELECT DISTINCT project FROM time_entries WHERE project NOT LIKE '[HIDDEN]%' ORDER BY project");
+            // Get projects from the projects table
+            QSqlQuery query("SELECT name FROM projects ORDER BY name");
             while (query.next()) {
                 projectsList->addItem(query.value(0).toString());
             }
-        }
-        
-        // Also load any additional projects from config file
-        QString dataDir = floatingButton->getCurrentDataFolder();
-        QString configFile = dataDir + "/.config/projects";
-        QFile file(configFile);
-        if (file.exists() && file.open(QIODevice::ReadOnly)) {
-            QTextStream in(&file);
-            while (!in.atEnd()) {
-                QString line = in.readLine().trimmed();
-                if (!line.isEmpty()) {
-                    // Only add if not already in list
-                    bool found = false;
-                    for (int i = 0; i < projectsList->count(); ++i) {
-                        if (projectsList->item(i)->text() == line) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        projectsList->addItem(line);
-                    }
+            
+            // Also get any projects from time_entries that aren't in projects table
+            query.exec("SELECT DISTINCT project FROM time_entries WHERE project NOT LIKE '[HIDDEN]%' AND project NOT IN (SELECT name FROM projects) ORDER BY project");
+            while (query.next()) {
+                QString project = query.value(0).toString();
+                if (!project.isEmpty()) {
+                    projectsList->addItem(project);
+                    // Add to projects table for future reference
+                    QSqlQuery insertQuery;
+                    insertQuery.prepare("INSERT OR IGNORE INTO projects (name) VALUES (?)");
+                    insertQuery.addBindValue(project);
+                    insertQuery.exec();
                 }
             }
         }
     }
     
     void saveProjects() {
-        QString dataDir = floatingButton->getCurrentDataFolder();
-        QString configFile = dataDir + "/.config/projects";
-        QFileInfo configInfo(configFile);
-        QDir().mkpath(configInfo.absolutePath());
-        
-        QFile file(configFile);
-        if (file.open(QIODevice::WriteOnly)) {
-            QTextStream out(&file);
+        // Clear existing projects and re-add from the list
+        QSqlDatabase db = QSqlDatabase::database();
+        if (db.isValid()) {
+            QSqlQuery query;
+            
+            // Clear all projects (they'll be re-added from the list)
+            query.exec("DELETE FROM projects");
+            
+            // Add all projects from the list
             for (int i = 0; i < projectsList->count(); ++i) {
-                out << projectsList->item(i)->text() << "\n";
+                QString project = projectsList->item(i)->text();
+                if (!project.isEmpty()) {
+                    query.prepare("INSERT INTO projects (name) VALUES (?)");
+                    query.addBindValue(project);
+                    query.exec();
+                }
             }
         }
     }
     
     void loadActivities() {
-        // Load base activities (same as ActivityDialog)
-        QStringList baseActivities = {
-            "Legal research", "Investigation", "Discovery Review",
-            "File Review", "Client Communication"
-        };
-        
-        for (const QString& activity : baseActivities) {
-            activitiesList->addItem(activity);
-        }
-        
-        // Load custom activities from the same location as ActivityDialog
-        QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/custom_activities";
-        QFile file(configFile);
-        if (file.exists() && file.open(QIODevice::ReadOnly)) {
-            QTextStream in(&file);
-            while (!in.atEnd()) {
-                QString line = in.readLine().trimmed();
-                if (!line.isEmpty()) {
-                    activitiesList->addItem(line);
-                }
+        // Load all activities from database (default and custom)
+        QSqlDatabase db = QSqlDatabase::database();
+        if (db.isValid()) {
+            QSqlQuery query("SELECT name FROM activities ORDER BY is_custom, name");
+            while (query.next()) {
+                activitiesList->addItem(query.value(0).toString());
             }
         }
         
@@ -1448,23 +1473,26 @@ private slots:
     }
     
     void saveActivities() {
-        // Save only custom activities (excluding base activities and "Other")
-        QStringList baseActivities = {
-            "Legal research", "Investigation", "Discovery Review",
-            "File Review", "Client Communication", "Other"
-        };
-        
-        QString configFile = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.config/timetracker/custom_activities";
-        QFileInfo configInfo(configFile);
-        QDir().mkpath(configInfo.absolutePath());
-        
-        QFile file(configFile);
-        if (file.open(QIODevice::WriteOnly)) {
-            QTextStream out(&file);
+        // Save all activities to database (preserving default vs custom)
+        QSqlDatabase db = QSqlDatabase::database();
+        if (db.isValid()) {
+            QStringList defaultActivities = {
+                "Legal research", "Investigation", "Discovery Review",
+                "File Review", "Client Communication"
+            };
+            
+            QSqlQuery query;
+            
+            // Clear custom activities only (keep defaults)
+            query.exec("DELETE FROM activities WHERE is_custom = 1");
+            
+            // Add all activities from the list (skipping "Other" and defaults)
             for (int i = 0; i < activitiesList->count(); ++i) {
                 QString activity = activitiesList->item(i)->text();
-                if (!baseActivities.contains(activity)) {
-                    out << activity << "\n";
+                if (!activity.isEmpty() && activity != "Other" && !defaultActivities.contains(activity)) {
+                    query.prepare("INSERT OR IGNORE INTO activities (name, is_custom) VALUES (?, 1)");
+                    query.addBindValue(activity);
+                    query.exec();
                 }
             }
         }

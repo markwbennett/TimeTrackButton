@@ -26,9 +26,8 @@ get_data_folder() {
         end try
         ")
         
-        # Remove trailing slash and add TimeTracker subfolder
+        # Remove trailing slash - use selected folder directly
         DATA_FOLDER=$(echo "$DATA_FOLDER" | sed 's:/$::')
-        DATA_FOLDER="$DATA_FOLDER/TimeTracker"
         
         # Create config directory and save choice
         mkdir -p "$(dirname "$CONFIG_FILE")"
