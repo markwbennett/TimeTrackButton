@@ -49,7 +49,20 @@ if [ $? -eq 0 ]; then
         
         echo ""
         echo "🎉 C++ Time Tracker built successfully!"
-        echo "Run with: open TimeTracker_CPP.app"
+        echo "🔧 Creating self-contained bundle..."
+        
+        # Create self-contained bundle
+        cd ..
+        ./bundle_complete_qt.sh
+        
+        if [ $? -eq 0 ]; then
+            echo "✅ Self-contained bundle created!"
+            echo "📊 Final app size: $(du -sh TimeTracker_CPP.app | cut -f1)"
+            echo "Run with: open TimeTracker_CPP.app"
+        else
+            echo "⚠️  Bundling failed, but basic app is available"
+            echo "Run with: open TimeTracker_CPP.app"
+        fi
     else
         echo "❌ App bundle not found after build"
         exit 1
