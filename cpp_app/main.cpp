@@ -1380,7 +1380,7 @@ private slots:
         }
         
         // Also load any additional projects from config file
-        QString dataDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/TimeTracker";
+        QString dataDir = floatingButton->getCurrentDataFolder();
         QString configFile = dataDir + "/.config/projects";
         QFile file(configFile);
         if (file.exists() && file.open(QIODevice::ReadOnly)) {
@@ -1405,7 +1405,7 @@ private slots:
     }
     
     void saveProjects() {
-        QString dataDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/TimeTracker";
+        QString dataDir = floatingButton->getCurrentDataFolder();
         QString configFile = dataDir + "/.config/projects";
         QFileInfo configInfo(configFile);
         QDir().mkpath(configInfo.absolutePath());
