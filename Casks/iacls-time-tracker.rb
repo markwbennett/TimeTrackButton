@@ -7,7 +7,7 @@ cask "iacls-time-tracker" do
   desc "Floating button time tracker for lawyers"
   homepage "https://github.com/markwbennett/TimeTrackButton"
 
-  app "TimeTracker_CPP.app", target: "IACLS Time Tracker.app"
+  app "TimeTracker_Universal.app", target: "IACLS Time Tracker.app"
 
   zap trash: [
     "~/Documents/TimeTracker",
