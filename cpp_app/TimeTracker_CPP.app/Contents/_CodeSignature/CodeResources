@@ -203,6 +203,15 @@
 			<key>requirement</key>
 			<string>cdhash H"473f08a98d76addfb01a2c87898236d9f45453ae"</string>
 		</dict>
+		<key>PlugIns/sqldrivers/libqsqlite.dylib</key>
+		<dict>
+			<key>cdhash</key>
+			<data>
+			yzS0f6qb90CaG5pdOjHXbNNV7u0=
+			</data>
+			<key>requirement</key>
+			<string>cdhash H"cb34b47faa9bf7409a1b9a5d3a31d76cd355eeed"</string>
+		</dict>
 		<key>Resources/bells-2-31725.mp3</key>
 		<dict>
 			<key>hash2</key>

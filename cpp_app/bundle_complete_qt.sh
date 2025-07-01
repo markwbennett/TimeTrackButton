@@ -10,6 +10,7 @@ echo "🔧 Creating completely self-contained Qt bundle..."
 # Create Libraries and PlugIns directories
 mkdir -p "$LIBS_PATH"
 mkdir -p "$PLUGINS_PATH/platforms"
+mkdir -p "$PLUGINS_PATH/sqldrivers"
 
 # Qt libraries we need
 QT_LIBS=(
@@ -80,6 +81,21 @@ for plugin_src in "${PLUGIN_SOURCES[@]}"; do
     fi
 done
 
+# Copy SQL drivers
+echo "📦 Copying SQL drivers..."
+SQL_DRIVERS=(
+    "/opt/homebrew/opt/qt/share/qt/plugins/sqldrivers/libqsqlite.dylib"
+)
+
+for driver_src in "${SQL_DRIVERS[@]}"; do
+    if [ -f "$driver_src" ]; then
+        driver_name=$(basename "$driver_src")
+        echo "  Copying $driver_name..."
+        cp "$driver_src" "$PLUGINS_PATH/sqldrivers/"
+        chmod 755 "$PLUGINS_PATH/sqldrivers/$driver_name"
+    fi
+done
+
 # Create qt.conf
 echo "📝 Creating qt.conf..."
 cat > "$APP_PATH/Contents/Resources/qt.conf" << EOF
@@ -143,9 +159,14 @@ for plugin_file in "$PLUGINS_PATH/platforms"/*.dylib; do
     update_library_paths "$plugin_file" "plugin"
 done
 
+# Update SQL drivers
+for driver_file in "$PLUGINS_PATH/sqldrivers"/*.dylib; do
+    update_library_paths "$driver_file" "SQL driver"
+done
+
 echo "🧹 Stripping debug symbols..."
 # Strip all libraries and plugins
-for file in "$LIBS_PATH"/*.dylib "$PLUGINS_PATH/platforms"/*.dylib "$BINARY_PATH"; do
+for file in "$LIBS_PATH"/*.dylib "$PLUGINS_PATH/platforms"/*.dylib "$PLUGINS_PATH/sqldrivers"/*.dylib "$BINARY_PATH"; do
     if [ -f "$file" ]; then
         strip -x "$file" 2>/dev/null
     fi
@@ -162,6 +183,14 @@ done
 
 # Sign plugins
 for file in "$PLUGINS_PATH/platforms"/*.dylib; do
+    if [ -f "$file" ]; then
+        echo "  Signing $(basename "$file")..."
+        codesign --force --sign - "$file" 2>/dev/null
+    fi
+done
+
+# Sign SQL drivers
+for file in "$PLUGINS_PATH/sqldrivers"/*.dylib; do
     if [ -f "$file" ]; then
         echo "  Signing $(basename "$file")..."
         codesign --force --sign - "$file" 2>/dev/null
