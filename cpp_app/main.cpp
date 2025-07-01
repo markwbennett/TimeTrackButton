@@ -1538,7 +1538,7 @@ int main(int argc, char *argv[]) {
     QMenuBar* menuBar = new QMenuBar();
     QMenu* appMenu = menuBar->addMenu("TimeTracker");
     
-    QAction* aboutAction = new QAction("About IACLS Time Tracker", &app);
+    QAction* aboutAction = new QAction("About IACLS Time Tracker", menuBar);
     appMenu->addAction(aboutAction);
     QObject::connect(aboutAction, &QAction::triggered, [&]() {
         AboutDialog aboutDialog;
@@ -1549,7 +1549,7 @@ int main(int argc, char *argv[]) {
     
     DraggableHandle handle;
     
-    QAction* preferencesAction = new QAction("Preferences...", &app);
+    QAction* preferencesAction = new QAction("Preferences...", menuBar);
     appMenu->addAction(preferencesAction);
     QObject::connect(preferencesAction, &QAction::triggered, [&handle]() {
         PreferencesDialog preferencesDialog(handle.getFloatingButton());
