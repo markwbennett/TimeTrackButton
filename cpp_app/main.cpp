@@ -189,16 +189,30 @@ public:
                 });
         
         auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
-        connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
+        connect(buttons, &QDialogButtonBox::accepted, this, &ProjectDialog::validateAndAccept);
         connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
         layout->addWidget(buttons);
     }
     
     QString getSelectedProject() const {
         if (combo->currentText() == "New Project") {
-            return newProjectInput->text();
+            return newProjectInput->text().trimmed();
         }
         return combo->currentText();
+    }
+
+private slots:
+    void validateAndAccept() {
+        if (combo->currentText() == "New Project") {
+            QString projectName = newProjectInput->text().trimmed();
+            if (projectName.isEmpty()) {
+                QMessageBox::warning(this, "Invalid Project Name", 
+                    "Please enter a name for the new project.");
+                newProjectInput->setFocus();
+                return;
+            }
+        }
+        accept();
     }
 
 private:

@@ -365,10 +365,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			25ERdf0JBwpRHpDW9IAxrVoFRek=
+			SzExOgWAgETaYchkYyHbW2ebkSY=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"db911175fd09070a511e90d6f48031ad5a0545e9"</string>
+			<string>cdhash H"4b31313a05808044da61c8646321db5b679b9126"</string>
 		</dict>
 		<key>PlugIns/iconengines/libqsvgicon.dylib</key>
 		<dict>
