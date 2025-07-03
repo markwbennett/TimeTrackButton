@@ -1,0 +1,5 @@
+/Users/markbennett/github/TimeTrackButton/cpp_app/build_universal/CMakeFiles/TimeTracker.dir
+/Users/markbennett/github/TimeTrackButton/cpp_app/build_universal/CMakeFiles/edit_cache.dir
+/Users/markbennett/github/TimeTrackButton/cpp_app/build_universal/CMakeFiles/rebuild_cache.dir
+/Users/markbennett/github/TimeTrackButton/cpp_app/build_universal/CMakeFiles/TimeTracker_autogen_timestamp_deps.dir
+/Users/markbennett/github/TimeTrackButton/cpp_app/build_universal/CMakeFiles/TimeTracker_autogen.dir

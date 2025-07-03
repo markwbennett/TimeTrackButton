@@ -1,155 +1,221 @@
 #!/bin/bash
 
-APP_PATH="TimeTracker_Universal.app"
-BUILD_DIR="build_universal"
+# Universal build script for TimeTracker with minimal Qt bundling
+cd "$(dirname "$0")"
 
-echo "🔨 Building universal Qt Time Tracker..."
-
-# Clean previous builds
-rm -rf "$BUILD_DIR" "$APP_PATH"
+echo "🔨 Building TimeTracker with minimal dependencies..."
 
 # Create build directory
-mkdir -p "$BUILD_DIR"
-cd "$BUILD_DIR"
+mkdir -p build_universal
+cd build_universal
 
-echo "⚙️  Configuring for universal build..."
-
-# Configure with regular Qt but optimized for deployment
+# Configure with CMake for universal binary
 cmake .. \
+    -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_PREFIX_PATH="/opt/homebrew/opt/qt/lib/cmake" \
-    -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15
+    -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
 
-echo "🔧 Building application..."
+# Build the application
 make -j$(sysctl -n hw.ncpu)
 
-if [ $? -ne 0 ]; then
-    echo "❌ Build failed"
+# Create the app bundle directory structure
+APP_NAME="TimeTracker_Universal.app"
+rm -rf "../$APP_NAME"
+mkdir -p "../$APP_NAME/Contents/"{MacOS,Resources,Frameworks,PlugIns}
+
+# Copy the executable
+cp TimeTracker "../$APP_NAME/Contents/MacOS/TimeTracker_real"
+
+# Create minimal Info.plist
+cat > "../$APP_NAME/Contents/Info.plist" << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleExecutable</key>
+    <string>TimeTracker</string>
+    <key>CFBundleIdentifier</key>
+    <string>org.iacls.timetracker</string>
+    <key>CFBundleName</key>
+    <string>IACLS Time Tracker</string>
+    <key>CFBundleVersion</key>
+    <string>1.0</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleIconFile</key>
+    <string>icon.icns</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>11.0</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+</dict>
+</plist>
+EOF
+
+# Copy resources
+cp ../../assets/bells-2-31725.mp3 "../$APP_NAME/Contents/Resources/"
+cp ../icon.icns "../$APP_NAME/Contents/Resources/" 2>/dev/null || echo "⚠️  icon.icns not found, skipping"
+
+echo "📦 Bundling only required Qt components..."
+
+# Function to get Qt installation path
+get_qt_path() {
+    if [ -d "/opt/homebrew/lib" ]; then
+        echo "/opt/homebrew"
+    elif [ -d "/usr/local/lib" ]; then
+        echo "/usr/local"
+    else
+        echo "❌ Qt installation not found" >&2
+        exit 1
+    fi
+}
+
+QT_PATH=$(get_qt_path)
+FRAMEWORKS_DIR="../$APP_NAME/Contents/Frameworks"
+PLUGINS_DIR="../$APP_NAME/Contents/PlugIns"
+
+# Only bundle frameworks actually used by the application
+REQUIRED_FRAMEWORKS=(
+    "QtCore"
+    "QtGui" 
+    "QtWidgets"
+    "QtSql"
+    "QtMultimedia"
+    "QtNetwork"  # Required by QtMultimedia
+)
+
+echo "🔗 Bundling required Qt frameworks..."
+for framework in "${REQUIRED_FRAMEWORKS[@]}"; do
+    framework_path="$QT_PATH/lib/$framework.framework"
+    if [ -d "$framework_path" ]; then
+        echo "  → $framework"
+        cp -R "$framework_path" "$FRAMEWORKS_DIR/"
+        
+        # Clean up unnecessary files from framework
+        find "$FRAMEWORKS_DIR/$framework.framework" -name "Headers" -type d -exec rm -rf {} + 2>/dev/null || true
+        find "$FRAMEWORKS_DIR/$framework.framework" -name "*_debug*" -delete 2>/dev/null || true
+    else
+        echo "⚠️  Framework $framework not found at $framework_path"
+    fi
+done
+
+# Bundle only essential Qt plugins
+echo "🔌 Bundling essential Qt plugins..."
+
+# Platform plugin (required)
+mkdir -p "$PLUGINS_DIR/platforms"
+if [ -f "$QT_PATH/plugins/platforms/libqcocoa.dylib" ]; then
+    cp "$QT_PATH/plugins/platforms/libqcocoa.dylib" "$PLUGINS_DIR/platforms/"
+    echo "  → Platform: Cocoa"
+else
+    echo "❌ Critical: libqcocoa.dylib not found"
     exit 1
 fi
 
-echo "✅ Build successful!"
-
-# Move the app bundle
-mv TimeTracker.app "../$APP_PATH"
-cd ..
-
-echo "📦 Using Qt's macdeployqt for complete deployment..."
-
-# Use Qt's official deployment tool
-if command -v macdeployqt >/dev/null 2>&1; then
-    echo "Using system macdeployqt..."
-    macdeployqt "$APP_PATH" -verbose=2 -always-overwrite
-elif [ -f "/opt/homebrew/opt/qt/bin/macdeployqt" ]; then
-    echo "Using Homebrew macdeployqt..."
-    /opt/homebrew/opt/qt/bin/macdeployqt "$APP_PATH" -verbose=2 -always-overwrite
+# SQL driver (required for SQLite)
+mkdir -p "$PLUGINS_DIR/sqldrivers"
+if [ -f "$QT_PATH/plugins/sqldrivers/libqsqlite.dylib" ]; then
+    cp "$QT_PATH/plugins/sqldrivers/libqsqlite.dylib" "$PLUGINS_DIR/sqldrivers/"
+    echo "  → SQL: SQLite driver"
 else
-    echo "⚠️  macdeployqt not found, using manual deployment..."
-    ./bundle_complete_qt.sh
+    echo "❌ Critical: libqsqlite.dylib not found"
+    exit 1
 fi
 
-echo "🔧 Creating environment isolation wrapper..."
+# Audio plugin (required for multimedia)
+mkdir -p "$PLUGINS_DIR/multimedia"
+if [ -f "$QT_PATH/plugins/multimedia/libdarwinmediaplugin.dylib" ]; then
+    cp "$QT_PATH/plugins/multimedia/libdarwinmediaplugin.dylib" "$PLUGINS_DIR/multimedia/"
+    echo "  → Multimedia: Darwin media plugin"
+fi
 
-# Create a launcher that completely isolates the environment
-cat > "$APP_PATH/Contents/MacOS/TimeTracker_launcher" << 'EOF'
+echo "🔧 Fixing library paths..."
+
+# Fix framework internal paths
+for framework in "${REQUIRED_FRAMEWORKS[@]}"; do
+    framework_binary="$FRAMEWORKS_DIR/$framework.framework/$framework"
+    if [ -f "$framework_binary" ]; then
+        # Update framework's internal references
+        install_name_tool -id "@executable_path/../Frameworks/$framework.framework/$framework" "$framework_binary" 2>/dev/null || true
+        
+        # Fix references to other Qt frameworks
+        for dep_framework in "${REQUIRED_FRAMEWORKS[@]}"; do
+            if [ "$framework" != "$dep_framework" ]; then
+                install_name_tool -change "$QT_PATH/lib/$dep_framework.framework/Versions/*//$dep_framework" \
+                    "@executable_path/../Frameworks/$dep_framework.framework/$dep_framework" \
+                    "$framework_binary" 2>/dev/null || true
+                install_name_tool -change "$QT_PATH/lib/$dep_framework.framework/$dep_framework" \
+                    "@executable_path/../Frameworks/$dep_framework.framework/$dep_framework" \
+                    "$framework_binary" 2>/dev/null || true
+            fi
+        done
+    fi
+done
+
+# Fix main executable paths
+MAIN_EXECUTABLE="../$APP_NAME/Contents/MacOS/TimeTracker_real"
+for framework in "${REQUIRED_FRAMEWORKS[@]}"; do
+    install_name_tool -change "$QT_PATH/lib/$framework.framework/Versions/*/$framework" \
+        "@executable_path/../Frameworks/$framework.framework/$framework" \
+        "$MAIN_EXECUTABLE" 2>/dev/null || true
+    install_name_tool -change "$QT_PATH/lib/$framework.framework/$framework" \
+        "@executable_path/../Frameworks/$framework.framework/$framework" \
+        "$MAIN_EXECUTABLE" 2>/dev/null || true
+done
+
+# Fix plugin paths
+find "$PLUGINS_DIR" -name "*.dylib" -exec install_name_tool -change "$QT_PATH/lib/QtCore.framework/Versions/*/QtCore" "@executable_path/../Frameworks/QtCore.framework/QtCore" {} \; 2>/dev/null || true
+find "$PLUGINS_DIR" -name "*.dylib" -exec install_name_tool -change "$QT_PATH/lib/QtGui.framework/Versions/*/QtGui" "@executable_path/../Frameworks/QtGui.framework/QtGui" {} \; 2>/dev/null || true
+find "$PLUGINS_DIR" -name "*.dylib" -exec install_name_tool -change "$QT_PATH/lib/QtWidgets.framework/Versions/*/QtWidgets" "@executable_path/../Frameworks/QtWidgets.framework/QtWidgets" {} \; 2>/dev/null || true
+
+# Create qt.conf for plugin discovery
+cat > "../$APP_NAME/Contents/Resources/qt.conf" << 'EOF'
+[Paths]
+Plugins = PlugIns
+EOF
+
+# Create launcher script that ensures clean Qt environment
+cat > "../$APP_NAME/Contents/MacOS/TimeTracker" << 'EOF'
 #!/bin/bash
 
 # Get the directory containing this script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 APP_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 
-# Completely clear Qt environment to avoid any conflicts
+# Clear Qt environment to avoid conflicts
 unset QT_PLUGIN_PATH
 unset QT_QPA_PLATFORM_PLUGIN_PATH
 unset QTDIR
-unset QT_SELECT
-unset QML2_IMPORT_PATH
-unset QT_QUICK_CONTROLS_STYLE
-unset QT_LOGGING_RULES
-unset QT_SCALE_FACTOR
-unset QT_AUTO_SCREEN_SCALE_FACTOR
-
-# Clear all library paths that might cause conflicts
 unset DYLD_LIBRARY_PATH
 unset DYLD_FRAMEWORK_PATH
-unset DYLD_FALLBACK_LIBRARY_PATH
-unset DYLD_FALLBACK_FRAMEWORK_PATH
 
 # Set up isolated environment pointing only to our bundled libraries
 export QT_PLUGIN_PATH="$APP_DIR/Contents/PlugIns"
 export QT_QPA_PLATFORM_PLUGIN_PATH="$APP_DIR/Contents/PlugIns/platforms"
-
-# Ensure we use our bundled frameworks/libraries first
 export DYLD_FRAMEWORK_PATH="$APP_DIR/Contents/Frameworks"
-export DYLD_LIBRARY_PATH="$APP_DIR/Contents/Libraries:$APP_DIR/Contents/Frameworks"
-
-# Disable Qt's plugin cache to force fresh discovery
-export QT_NO_GLIB=1
 
 # Run the actual application
 exec "$SCRIPT_DIR/TimeTracker_real" "$@"
 EOF
 
-# Make the launcher executable
-chmod +x "$APP_PATH/Contents/MacOS/TimeTracker_launcher"
+chmod +x "../$APP_NAME/Contents/MacOS/TimeTracker"
 
-# Rename the original binary
-if [ -f "$APP_PATH/Contents/MacOS/TimeTracker" ]; then
-    mv "$APP_PATH/Contents/MacOS/TimeTracker" "$APP_PATH/Contents/MacOS/TimeTracker_real"
-fi
+echo "📊 Bundle size analysis:"
+du -sh "../$APP_NAME"
+echo ""
+echo "Framework sizes:"
+du -sh "../$APP_NAME/Contents/Frameworks/"* 2>/dev/null | sort -hr || echo "No frameworks bundled"
 
-# Replace with our launcher
-mv "$APP_PATH/Contents/MacOS/TimeTracker_launcher" "$APP_PATH/Contents/MacOS/TimeTracker"
-
-echo "🔧 Ensuring SQL drivers are included..."
-
-# Make sure SQL drivers are present
-PLUGINS_DIR="$APP_PATH/Contents/PlugIns"
-mkdir -p "$PLUGINS_DIR/sqldrivers"
-
-if [ ! -f "$PLUGINS_DIR/sqldrivers/libqsqlite.dylib" ]; then
-    echo "  Adding missing SQL drivers..."
-    if [ -f "/opt/homebrew/opt/qt/share/qt/plugins/sqldrivers/libqsqlite.dylib" ]; then
-        cp "/opt/homebrew/opt/qt/share/qt/plugins/sqldrivers/libqsqlite.dylib" "$PLUGINS_DIR/sqldrivers/"
-        chmod 755 "$PLUGINS_DIR/sqldrivers/libqsqlite.dylib"
-        
-        # Update the SQL driver's library paths
-        if [ -d "$APP_PATH/Contents/Frameworks" ]; then
-            # macdeployqt uses Frameworks
-            for framework in "$APP_PATH/Contents/Frameworks"/*.framework; do
-                if [ -d "$framework" ]; then
-                    framework_name=$(basename "$framework" .framework)
-                    install_name_tool -change "/opt/homebrew/opt/qt/lib/${framework_name}.framework/Versions/A/${framework_name}" "@executable_path/../Frameworks/${framework_name}.framework/Versions/A/${framework_name}" "$PLUGINS_DIR/sqldrivers/libqsqlite.dylib" 2>/dev/null
-                fi
-            done
-        fi
-        
-        # Sign the SQL driver
-        codesign --force --sign - "$PLUGINS_DIR/sqldrivers/libqsqlite.dylib" 2>/dev/null
-    fi
-fi
-
-echo "🔐 Final code signing..."
-# Re-sign the entire bundle
-codesign --force --deep --sign - "$APP_PATH" 2>/dev/null
-
-echo "🔍 Verifying deployment..."
-
-# Check what libraries the binary depends on
-echo "Main binary dependencies:"
-otool -L "$APP_PATH/Contents/MacOS/TimeTracker_real" | head -10
-
-# Check for problematic dependencies
-if otool -L "$APP_PATH/Contents/MacOS/TimeTracker_real" | grep -E "(/opt/homebrew|/usr/local)" | grep -v "/usr/lib/system" | grep -v "@executable_path"; then
-    echo "⚠️  Warning: Some external dependencies detected"
-    echo "The app may still work but might have issues on systems without Qt"
-else
-    echo "✅ Clean deployment - no external Qt dependencies"
-fi
-
-echo "📊 Final app size:"
-du -sh "$APP_PATH"
-
-echo "✅ Universal Qt application created!"
-echo "🚀 This app should work on any macOS system regardless of Qt installation"
-echo "🔧 Run with: open $APP_PATH" 
+echo ""
+echo "✅ Minimal TimeTracker bundle created at: $APP_NAME"
+echo "🎯 Only essential Qt components included:"
+echo "   • QtCore, QtGui, QtWidgets (UI)"
+echo "   • QtSql (SQLite database)"  
+echo "   • QtMultimedia + QtNetwork (audio)"
+echo "   • Essential plugins only"
+echo ""
+echo "🚫 Excluded unnecessary components:"
+echo "   • QtDBus (not used)"
+echo "   • Development headers"
+echo "   • Debug libraries"
+echo "   • Optional plugins" 
