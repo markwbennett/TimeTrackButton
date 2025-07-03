@@ -15,7 +15,7 @@ Version 1.2.0 is **completely self-contained** and requires **NO external depend
 ### Method 1: Homebrew (Recommended)
 ```bash
 # Install via Homebrew tap
-brew install --cask markwbennett/timetrackbutton/iacls-time-tracker
+brew install --cask markwbennett/iacls/iacls-time-tracker
 ```
 
 The app will be installed as "IACLS Time Tracker" in your Applications folder.

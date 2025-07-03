@@ -82,7 +82,7 @@ open TimeTracker_CPP.app
 
 ### Homebrew (Recommended)
 ```bash
-brew tap markwbennett/timetrackbutton
+brew tap markwbennett/iacls
 brew install --cask iacls-time-tracker
 ```
 

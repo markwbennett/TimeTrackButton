@@ -18,13 +18,13 @@ chmod +x install.sh
 
 ### Option 1: Install from Homebrew tap
 ```bash
-brew tap markwbennett/timetrackbutton
+brew tap markwbennett/iacls
 brew install --cask iacls-time-tracker
 ```
 
 ### Option 2: Direct install from tap
 ```bash
-brew install --cask markwbennett/timetrackbutton/iacls-time-tracker
+brew install --cask markwbennett/iacls/iacls-time-tracker
 ```
 
 ### Option 3: Install from local repository
