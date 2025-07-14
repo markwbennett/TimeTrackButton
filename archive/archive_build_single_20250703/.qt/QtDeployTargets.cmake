@@ -1,2 +1,0 @@
-set(__QT_DEPLOY_TARGET_TimeTracker_FILE /Users/markbennett/github/TimeTrackButton/cpp_app/build_single/TimeTracker.app/Contents/MacOS/TimeTracker)
-set(__QT_DEPLOY_TARGET_TimeTracker_TYPE EXECUTABLE)

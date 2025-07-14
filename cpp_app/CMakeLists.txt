@@ -21,6 +21,19 @@ target_link_libraries(TimeTracker
     Qt6::Multimedia
 )
 
+# Link macOS frameworks for detailed tracking
+if(APPLE)
+    find_library(CORE_FOUNDATION_FRAMEWORK CoreFoundation)
+    find_library(APPLICATION_SERVICES_FRAMEWORK ApplicationServices)
+    find_library(IOKIT_FRAMEWORK IOKit)
+    
+    target_link_libraries(TimeTracker
+        ${CORE_FOUNDATION_FRAMEWORK}
+        ${APPLICATION_SERVICES_FRAMEWORK}
+        ${IOKIT_FRAMEWORK}
+    )
+endif()
+
 # Set app bundle properties
 set_target_properties(TimeTracker PROPERTIES
     MACOSX_BUNDLE TRUE

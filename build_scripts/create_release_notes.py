@@ -6,70 +6,62 @@ Create release notes for IACLS Time Tracker dual-architecture release
 def create_release_notes():
     """Generate release notes for the dual-architecture release"""
     
-    version = "1.2.0"  # Increment version for dual-architecture support
+    version = "2.0.0"  # Major version increment for pause tracking functionality
     
-    release_notes = f"""# IACLS Time Tracker v{version} - Dual Architecture Support
+    release_notes = f"""# IACLS Time Tracker v{version} - Pause Tracking & Inactivity Detection
 
 ## 🎉 New Features
-- **Intel Mac Support**: Now available for both Apple Silicon (ARM64) and Intel (x86_64) Macs
-- **Dual Architecture Builds**: Separate optimized builds for each architecture
+- **Pause Tracking**: Manually pause and resume tracking sessions with button click
+- **Auto-Pause**: Automatically pauses tracking after 5 minutes of inactivity  
+- **Smart Time Calculation**: Elapsed time excludes paused periods for accurate billing
+- **Visual State Indicators**: 
+  - Green: Actively tracking
+  - Orange: Paused (shows "(Paused)" text)  
+  - Red: Not tracking
+- **Seamless Resume**: Click button when paused to instantly resume tracking
 
-## 📦 Downloads
+## 🔧 Technical Improvements
+- **Enhanced Database**: New pause_periods table tracks all pause/resume events
+- **Idle Detection**: Uses macOS system APIs to monitor user activity
+- **State Persistence**: Pause state synchronized across all app instances
+- **SketchyBar Integration**: Status bar shows paused state with orange background
 
-### For Apple Silicon Macs (M1/M2/M3/M4)
-- **Homebrew (Recommended)**: `brew install --cask iacls-time-tracker`
-- **Direct Download**: `IACLS_Time_Tracker_macOS.zip` (ARM64)
+## 📦 Installation
 
-### For Intel Macs
-- **Direct Download**: `IACLS_Time_Tracker_macOS_x86_64.zip` (x86_64)
-
-## 🔧 Installation Instructions
-
-### Apple Silicon Macs (Recommended)
+### Homebrew (Recommended)
 ```bash
-# Install via Homebrew (easiest)
 brew install --cask iacls-time-tracker
-
-# Or download and run the .app directly
 ```
 
-### Intel Macs
-1. Download `IACLS_Time_Tracker_macOS_x86_64.zip`
-2. Extract and run "IACLS Time Tracker x86_64.app"
-3. Allow in System Preferences > Security & Privacy if prompted
+### Manual Installation
+1. Download the latest release from GitHub
+2. Extract and move to Applications folder
+3. Run the app and follow setup instructions
 
-## ⚙️ Features
-- Floating circular button for time tracking
-- Visual status indicators (red = idle, green = tracking)
-- Chime notifications for tracking events
-- Data sync via Google Drive or local storage
-- SketchyBar plugin integration
-- Persistent state across app restarts
+## 🚀 Usage
 
-## 🏗️ Architecture Details
-- **ARM64 version**: Optimized for Apple Silicon, distributed via Homebrew
-- **x86_64 version**: Compatible with Intel Macs, direct download only
-- Both versions use Qt6 framework for native macOS integration
+### Pause/Resume Tracking
+- **While tracking**: Click button → Select "Pause Tracking" from menu
+- **While paused**: Click button → Automatically resumes tracking
+- **Auto-pause**: Tracking automatically pauses after 5 minutes of inactivity
 
-## 📋 System Requirements
-- **Apple Silicon**: macOS 11.0 (Big Sur) or later
-- **Intel**: macOS 10.15 (Catalina) or later
+### SketchyBar Integration
+- Green background: Actively tracking with elapsed time
+- Orange background: Paused state with "(Paused)" indicator
+- Red icon: Not tracking
 
-## 🐛 Known Issues
-- Intel version requires manual installation (not available via Homebrew)
-- First launch may require security permission approval
+## 🐛 Troubleshooting
 
-## 🔗 Links
-- [Repository](https://github.com/markwbennett/TimeTrackButton)
-- [Issues](https://github.com/markwbennett/TimeTrackButton/issues)
-- [SketchyBar Integration](https://github.com/markwbennett/TimeTrackButton#sketchybar-integration)
-
-## 🙏 Support
 If you encounter issues:
-1. Check the architecture of your Mac: `uname -m` (arm64 = Apple Silicon, x86_64 = Intel)
-2. Download the appropriate version
+1. Ensure you have macOS 11.0 or later
+2. Check that accessibility permissions are granted
 3. Report issues on GitHub with your Mac model and macOS version
-"""
+
+## 📝 Release Notes
+- Major version increment due to significant new pause/resume functionality
+- Database schema updated with pause_periods table
+- Enhanced UI with visual state indicators
+- Improved time accuracy by excluding paused periods"""
 
     return release_notes
 
@@ -83,9 +75,9 @@ def main():
     print("✅ Release notes created: RELEASE_NOTES.md")
     print("\n📋 Next steps:")
     print("1. Review the release notes")
-    print("2. Create a GitHub release with tag v1.2.0")
+    print("2. Create a GitHub release with tag v2.0.0")
     print("3. Upload both ZIP files as release assets")
-    print("4. Update Homebrew cask version to 1.2.0")
+    print("4. Update Homebrew cask version to 2.0.0")
 
 if __name__ == "__main__":
     main() 

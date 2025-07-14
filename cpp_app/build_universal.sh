@@ -39,9 +39,9 @@ cat > "../$APP_NAME/Contents/Info.plist" << 'EOF'
     <key>CFBundleName</key>
     <string>IACLS Time Tracker</string>
     <key>CFBundleVersion</key>
-    <string>1.0</string>
+    <string>2.0.0</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
+    <string>2.0.0</string>
     <key>CFBundleIconFile</key>
     <string>icon.icns</string>
     <key>LSMinimumSystemVersion</key>

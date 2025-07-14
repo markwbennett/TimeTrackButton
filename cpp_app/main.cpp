@@ -45,6 +45,233 @@
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMessageBox>
+#include <QProcess>
+#include <CoreFoundation/CoreFoundation.h>
+#include <ApplicationServices/ApplicationServices.h>
+#include <IOKit/IOKitLib.h>
+#include <IOKit/pwr_mgt/IOPMLib.h>
+
+class DetailedTracker {
+public:
+    struct ActivityData {
+        QString activeApp;
+        QString documentUrl;
+        int idleSeconds;
+        bool isLocked;
+        qint64 timestamp;
+    };
+    
+    static QString getActiveApplication() {
+        QString appName;
+        
+        // Use AppleScript to get the frontmost application
+        QProcess process;
+        QString script = R"(
+            tell application "System Events"
+                set frontApp to name of first application process whose frontmost is true
+                return frontApp
+            end tell
+        )";
+        
+        process.start("osascript", QStringList() << "-e" << script);
+        if (process.waitForFinished(2000)) {
+            appName = process.readAllStandardOutput().trimmed();
+        }
+        
+        return appName;
+    }
+    
+    static QString getActiveDocumentUrl() {
+        QString documentUrl;
+        
+        // First get the active application name
+        QString activeApp = getActiveApplication();
+        qDebug() << "getActiveDocumentUrl: activeApp =" << activeApp;
+        if (activeApp.isEmpty()) {
+            qDebug() << "getActiveDocumentUrl: activeApp is empty";
+            return documentUrl;
+        }
+        
+        QProcess process;
+        QString script;
+        
+        // Create specific script based on the active application
+        if (activeApp == "Safari") {
+            script = R"(
+                tell application "Safari"
+                    try
+                        if (count of windows) > 0 then
+                            return URL of current tab of front window
+                        end if
+                    on error
+                        return ""
+                    end try
+                end tell
+            )";
+        } else if (activeApp == "Google Chrome") {
+            script = R"(
+                tell application "Google Chrome"
+                    try
+                        if (count of windows) > 0 then
+                            return URL of active tab of front window
+                        end if
+                    on error
+                        return ""
+                    end try
+                end tell
+            )";
+        } else if (activeApp == "Microsoft Word") {
+            script = R"(
+                tell application "Microsoft Word"
+                    try
+                        if (count of documents) > 0 then
+                            return name of active document
+                        end if
+                    on error
+                        return ""
+                    end try
+                end tell
+            )";
+        } else if (activeApp == "Pages") {
+            script = R"(
+                tell application "Pages"
+                    try
+                        if (count of documents) > 0 then
+                            return name of front document
+                        end if
+                    on error
+                        return ""
+                    end try
+                end tell
+            )";
+        } else if (activeApp == "TextEdit") {
+            script = R"(
+                tell application "TextEdit"
+                    try
+                        if (count of documents) > 0 then
+                            return name of front document
+                        end if
+                    on error
+                        return ""
+                    end try
+                end tell
+            )";
+        } else if (activeApp == "Finder") {
+            script = R"(
+                tell application "Finder"
+                    try
+                        if (count of windows) > 0 then
+                            return POSIX path of (target of front window as alias)
+                        end if
+                    on error
+                        return ""
+                    end try
+                end tell
+            )";
+        } else if (activeApp.contains("Firefox")) {
+            script = R"(
+                tell application "Firefox"
+                    try
+                        return name of front window
+                    on error
+                        return ""
+                    end try
+                end tell
+            )";
+        } else if (activeApp == "Vivaldi") {
+            script = R"(
+                tell application "Vivaldi"
+                    try
+                        if (count of windows) > 0 then
+                            return URL of active tab of front window
+                        end if
+                    on error
+                        return ""
+                    end try
+                end tell
+            )";
+        } else if (activeApp.contains("Code") || activeApp.contains("Visual Studio Code")) {
+            script = R"(
+                tell application "Visual Studio Code"
+                    try
+                        return name of front window
+                    on error
+                        return ""
+                    end try
+                end tell
+            )";
+        } else {
+            // For unknown applications, try to get window title
+            script = QString(R"(
+                tell application "System Events"
+                    try
+                        tell process "%1"
+                            if (count of windows) > 0 then
+                                return name of front window
+                            end if
+                        end tell
+                    on error
+                        return ""
+                    end try
+                end tell
+            )").arg(activeApp);
+        }
+        
+        if (!script.isEmpty()) {
+            qDebug() << "getActiveDocumentUrl: executing AppleScript for" << activeApp;
+            process.start("osascript", QStringList() << "-e" << script);
+            if (process.waitForFinished(5000)) {  // Increased timeout to 5 seconds
+                documentUrl = process.readAllStandardOutput().trimmed();
+                qDebug() << "getActiveDocumentUrl: result =" << documentUrl;
+                
+                // Debug output to see what we're getting
+                if (process.exitCode() != 0) {
+                    QString error = process.readAllStandardError();
+                    qDebug() << "AppleScript error for" << activeApp << ":" << error;
+                }
+            } else {
+                qDebug() << "AppleScript timeout for" << activeApp;
+            }
+        } else {
+            qDebug() << "getActiveDocumentUrl: no script for" << activeApp;
+        }
+        
+        return documentUrl;
+    }
+    
+    static int getIdleTime() {
+        CFTimeInterval idleTime = CGEventSourceSecondsSinceLastEventType(kCGEventSourceStateCombinedSessionState, kCGAnyInputEventType);
+        return static_cast<int>(idleTime);
+    }
+    
+    static bool isScreenLocked() {
+        // Check if screen is locked by querying display sleep state
+        io_registry_entry_t entry = IORegistryEntryFromPath(kIOMainPortDefault, "IOService:/IOResources/IODisplayWrangler");
+        if (entry == MACH_PORT_NULL) {
+            return false;
+        }
+        
+        CFTypeRef obj = IORegistryEntryCreateCFProperty(entry, CFSTR("IODisplayWrangler"), kCFAllocatorDefault, 0);
+        IOObjectRelease(entry);
+        
+        if (obj) {
+            CFRelease(obj);
+            return false; // Display is active
+        }
+        
+        return true; // Display is likely locked/sleeping
+    }
+    
+    static ActivityData getCurrentActivity() {
+        ActivityData data;
+        data.activeApp = getActiveApplication();
+        data.documentUrl = getActiveDocumentUrl();
+        data.idleSeconds = getIdleTime();
+        data.isLocked = isScreenLocked();
+        data.timestamp = QDateTime::currentSecsSinceEpoch();
+        return data;
+    }
+};
 
 class StateManager {
 public:
@@ -302,7 +529,7 @@ private:
 
 class TrackingMenuDialog : public QDialog {
 public:
-    explicit TrackingMenuDialog(QWidget* parent = nullptr) : QDialog(parent) {
+    explicit TrackingMenuDialog(bool isPaused, QWidget* parent = nullptr) : QDialog(parent) {
         setWindowTitle("Tracking Options");
         setModal(true);
         
@@ -342,6 +569,8 @@ public:
         setAttribute(Qt::WA_TranslucentBackground);
         
         isTracking = false;
+        isPaused = false;
+        totalPausedSeconds = 0;
         lastKnownSessionStart = 0;
         
         // Setup data folder and state manager
@@ -365,6 +594,18 @@ public:
         displayTimer = new QTimer(this);
         connect(displayTimer, &QTimer::timeout, [this]() { updateAppearance(); });
         displayTimer->start(1000);
+        
+        // Detailed tracking timer - collect detailed data every minute when tracking
+        detailedTrackingTimer = new QTimer(this);
+        connect(detailedTrackingTimer, &QTimer::timeout, [this]() { collectDetailedData(); });
+        detailedTrackingTimer->setInterval(60000); // 60 seconds (1 minute)
+        
+        // Idle timer - check for inactivity every 30 seconds
+        idleTimer = new QTimer(this);
+        connect(idleTimer, &QTimer::timeout, [this]() { checkIdleTime(); });
+        idleTimer->setInterval(30000); // 30 seconds
+        
+        currentTimeEntryId = 0;
         
         // Load initial state from database/state file after timers are set up
         syncState();
@@ -404,7 +645,8 @@ protected:
         double innerRadius = (buttonRect.width() / 2.0) - 4;
         
         if (clickDistance <= innerRadius) {
-            if (!isTracking) {
+            if (!isTracking && !isPaused) {
+                // Start new tracking session
                 auto* dialog = new ProjectDialog(getProjects(), this);
                 if (dialog->exec() == QDialog::Accepted) {
                     QString project = dialog->getSelectedProject();
@@ -416,7 +658,12 @@ protected:
                         }
                     }
                 }
-            } else {
+            } else if (isPaused) {
+                // Resume tracking directly
+                resumeTracking();
+            } else if (isTracking) {
+                // Auto-pause when clicking on green circle, then show menu
+                pauseTracking("Manual pause");
                 showTrackingMenu();
             }
         }
@@ -534,20 +781,32 @@ private:
                         // This is a new tracking session - play chime and start timer
                         playChime();
                         lastKnownSessionStart = sessionStartTime;
+                        
+                        // Get the current time entry ID for detailed tracking
+                        QSqlQuery query;
+                        query.exec("SELECT id FROM time_entries WHERE end_time IS NULL ORDER BY start_time DESC LIMIT 1");
+                        if (query.next()) {
+                            currentTimeEntryId = query.value(0).toLongLong();
+                        }
                     }
-                    // Always ensure timer is running when tracking
+                    // Always ensure timers are running when tracking
                     chimeTimer->start();
+                    detailedTrackingTimer->start();
                 } else if (!isTracking && wasTracking) {
-                    // Stopped tracking externally - play chime and stop timer
+                    // Stopped tracking externally - play chime and stop timers
                     playChime();
                     chimeTimer->stop();
+                    detailedTrackingTimer->stop();
                     lastKnownSessionStart = 0;
+                    currentTimeEntryId = 0;
                 } else if (isTracking && !chimeTimer->isActive()) {
-                    // Already tracking but timer not active - start it (no chime)
+                    // Already tracking but timers not active - start them (no chime)
                     chimeTimer->start();
+                    detailedTrackingTimer->start();
                 } else if (!isTracking && chimeTimer->isActive()) {
-                    // Not tracking but timer still active - stop it
+                    // Not tracking but timers still active - stop them
                     chimeTimer->stop();
+                    detailedTrackingTimer->stop();
                 }
                 
                 // Update appearance
@@ -571,17 +830,54 @@ private:
         }
     }
     
+    void collectDetailedData() {
+        if (!isTracking || currentTimeEntryId == 0) return;
+        
+        try {
+            DetailedTracker::ActivityData data = DetailedTracker::getCurrentActivity();
+            
+            // Debug output to see what data we're collecting
+            qDebug() << "Collecting detailed data:";
+            qDebug() << "  Active App:" << data.activeApp;
+            qDebug() << "  Document/URL:" << data.documentUrl;
+            qDebug() << "  Idle Seconds:" << data.idleSeconds;
+            qDebug() << "  Is Locked:" << data.isLocked;
+            
+            QSqlQuery query;
+            query.prepare("INSERT INTO detailed_tracking (time_entry_id, timestamp, active_app, document_url, idle_seconds, is_locked) VALUES (?, ?, ?, ?, ?, ?)");
+            query.addBindValue(currentTimeEntryId);
+            query.addBindValue(data.timestamp);
+            query.addBindValue(data.activeApp);
+            query.addBindValue(data.documentUrl);
+            query.addBindValue(data.idleSeconds);
+            query.addBindValue(data.isLocked ? 1 : 0);
+            
+            if (!query.exec()) {
+                qDebug() << "Failed to insert detailed tracking data:" << query.lastError().text();
+            }
+            
+        } catch (...) {
+            qDebug() << "Exception in collectDetailedData";
+        }
+    }
+    
     void updateAppearance() {
-        QString color = isTracking ? "green" : "red";
+        QString color;
         QString text;
         int buttonSize;
         int borderRadius;
         
-        // Set size based on tracking state
-        if (isTracking) {
+        // Set color and size based on tracking state
+        if (isTracking && !isPaused) {
+            color = "green";
             buttonSize = 120;  // Large size when tracking
             borderRadius = 60;
+        } else if (isPaused) {
+            color = "orange";
+            buttonSize = 120;  // Large size when paused
+            borderRadius = 60;
         } else {
+            color = "red";
             buttonSize = 60;   // Small size when not tracking
             borderRadius = 30;
         }
@@ -589,9 +885,14 @@ private:
         // Update button size
         setFixedSize(buttonSize, buttonSize);
         
-        if (isTracking && !currentProject.isEmpty()) {
+        if (isPaused && !currentProject.isEmpty()) {
+            QString projectName = currentProject.length() > 13 ? 
+                                currentProject.left(13) : currentProject;
+            text = QString("%1\n(Paused)").arg(projectName);
+        } else if (isTracking && !currentProject.isEmpty()) {
             if (!startTime.isNull()) {
-                qint64 elapsed = startTime.secsTo(QDateTime::currentDateTime());
+                // Calculate elapsed time minus paused time
+                qint64 elapsed = startTime.secsTo(QDateTime::currentDateTime()) - totalPausedSeconds;
                 int hours = elapsed / 3600;
                 int minutes = (elapsed % 3600) / 60;
                 
@@ -663,6 +964,28 @@ private:
                   "name TEXT UNIQUE,"
                   "is_custom INTEGER DEFAULT 1,"
                   "created_at INTEGER DEFAULT (strftime('%s','now'))"
+                  ")");
+        
+        // Create detailed tracking table
+        query.exec("CREATE TABLE IF NOT EXISTS detailed_tracking ("
+                  "id INTEGER PRIMARY KEY,"
+                  "time_entry_id INTEGER,"
+                  "timestamp INTEGER,"
+                  "active_app TEXT,"
+                  "document_url TEXT,"
+                  "idle_seconds INTEGER DEFAULT 0,"
+                  "is_locked INTEGER DEFAULT 0,"
+                  "FOREIGN KEY (time_entry_id) REFERENCES time_entries(id)"
+                  ")");
+        
+        // Create pause periods table
+        query.exec("CREATE TABLE IF NOT EXISTS pause_periods ("
+                  "id INTEGER PRIMARY KEY,"
+                  "time_entry_id INTEGER,"
+                  "pause_start INTEGER,"
+                  "pause_end INTEGER,"
+                  "reason TEXT,"
+                  "FOREIGN KEY (time_entry_id) REFERENCES time_entries(id)"
                   ")");
         
         // Insert default activities if they don't exist
@@ -774,6 +1097,8 @@ private:
             currentProject = project;
             currentActivity = activity;
             isTracking = true;
+            isPaused = false;
+            totalPausedSeconds = 0;
             startTime = QDateTime::currentDateTime();
             
             // Add project to projects table if it doesn't exist
@@ -803,6 +1128,9 @@ private:
             query.addBindValue(startTime.toSecsSinceEpoch());
             query.exec();
             
+            // Get the ID of the newly inserted time entry
+            currentTimeEntryId = query.lastInsertId().toLongLong();
+            
             // Update state file
             QJsonObject state;
             state["is_tracking"] = true;
@@ -815,6 +1143,10 @@ private:
             playChime();
             chimeTimer->start();  // Will chime every 6 minutes
             lastKnownSessionStart = startTime.toSecsSinceEpoch();
+            
+            // Start detailed tracking and idle monitoring
+            detailedTrackingTimer->start();
+            idleTimer->start();
             
             updateAppearance();
             
@@ -840,10 +1172,14 @@ private:
             
             // Update state
             isTracking = false;
+            isPaused = false;
+            totalPausedSeconds = 0;
             currentProject.clear();
             currentActivity.clear();
             startTime = QDateTime();
+            pauseStartTime = QDateTime();
             lastKnownSessionStart = 0;
+            currentTimeEntryId = 0;
             
             // Update state file
             QJsonObject state;
@@ -853,9 +1189,11 @@ private:
             state["start_time"] = QJsonValue();
             stateManager->saveState(state);
             
-            // Play final chime and stop chime timer
+            // Play final chime and stop all timers
             playChime();
             chimeTimer->stop();
+            detailedTrackingTimer->stop();
+            idleTimer->stop();
             
             updateAppearance();
             
@@ -925,6 +1263,9 @@ private:
                         query.addBindValue(startTime.toSecsSinceEpoch());
                         query.exec();
                         
+                        // Get the ID of the newly inserted time entry
+                        currentTimeEntryId = query.lastInsertId().toLongLong();
+                        
                         // Update state file with new start time
                         QJsonObject state;
                         state["is_tracking"] = true;
@@ -947,7 +1288,7 @@ private:
     }
     
     void showTrackingMenu() {
-        auto* menu = new TrackingMenuDialog(this);
+        auto* menu = new TrackingMenuDialog(isPaused, this);
         if (menu->exec() == QDialog::Accepted) {
             QString action = menu->getSelectedAction();
             if (action == "change_activity") {
@@ -957,6 +1298,91 @@ private:
             } else if (action == "stop_tracking") {
                 stopTracking();
             }
+        } else {
+            // If user cancels menu, resume tracking since it was auto-paused
+            if (isPaused) {
+                resumeTracking();
+            }
+        }
+    }
+    
+    void pauseTracking(const QString& reason) {
+        if (!isTracking || isPaused) return;
+        
+        isPaused = true;
+        pauseStartTime = QDateTime::currentDateTime();
+        
+        // Stop timers
+        chimeTimer->stop();
+        detailedTrackingTimer->stop();
+        idleTimer->stop();
+        
+        // Insert pause record
+        QSqlQuery query;
+        query.prepare("INSERT INTO pause_periods (time_entry_id, pause_start, reason) VALUES (?, ?, ?)");
+        query.addBindValue(currentTimeEntryId);
+        query.addBindValue(pauseStartTime.toSecsSinceEpoch());
+        query.addBindValue(reason);
+        query.exec();
+        
+        // Update state file
+        QJsonObject state;
+        state["is_tracking"] = false;
+        state["is_paused"] = true;
+        state["project"] = currentProject;
+        state["activity"] = currentActivity;
+        state["start_time"] = startTime.toSecsSinceEpoch();
+        state["pause_start"] = pauseStartTime.toSecsSinceEpoch();
+        stateManager->saveState(state);
+        
+        playChime();
+        updateAppearance();
+    }
+    
+    void resumeTracking() {
+        if (!isPaused) return;
+        
+        isPaused = false;
+        QDateTime resumeTime = QDateTime::currentDateTime();
+        
+        // Calculate pause duration and add to total
+        qint64 pauseDuration = pauseStartTime.secsTo(resumeTime);
+        totalPausedSeconds += pauseDuration;
+        
+        // Update the pause record with end time
+        QSqlQuery query;
+        query.prepare("UPDATE pause_periods SET pause_end = ? WHERE time_entry_id = ? AND pause_end IS NULL");
+        query.addBindValue(resumeTime.toSecsSinceEpoch());
+        query.addBindValue(currentTimeEntryId);
+        query.exec();
+        
+        // Resume timers
+        chimeTimer->start();
+        detailedTrackingTimer->start();
+        idleTimer->start();
+        
+        // Update state file
+        QJsonObject state;
+        state["is_tracking"] = true;
+        state["is_paused"] = false;
+        state["project"] = currentProject;
+        state["activity"] = currentActivity;
+        state["start_time"] = startTime.toSecsSinceEpoch();
+        state["pause_start"] = QJsonValue();
+        stateManager->saveState(state);
+        
+        playChime();
+        updateAppearance();
+    }
+    
+    void checkIdleTime() {
+        if (!isTracking || isPaused) return;
+        
+        int idleSeconds = DetailedTracker::getIdleTime();
+        
+        // Auto-pause after 5 minutes (300 seconds) of inactivity
+        if (idleSeconds >= 300) {
+            pauseTracking("Auto-pause due to inactivity");
         }
     }
     
@@ -967,7 +1393,7 @@ private:
         QTextStream out(&file);
         out << "ID,Project,Activity,Start Time,End Time,Duration,Hours\n";
         
-        QSqlQuery query("SELECT id, project, activity, start_time, end_time FROM time_entries");
+        QSqlQuery query("SELECT id, project, activity, start_time, end_time FROM time_entries ORDER BY start_time DESC");
         while (query.next()) {
             int id = query.value(0).toInt();
             QString project = query.value(1).toString();
@@ -995,15 +1421,81 @@ private:
                 decimalHours = std::ceil((duration / 3600.0) * 10) / 10.0;
             }
             
-            // Fixed CSV output - properly format the decimal hours
+            // Properly escape CSV fields that contain commas
+            auto escapeCSV = [](const QString& field) {
+                if (field.contains(',') || field.contains('"') || field.contains('\n')) {
+                    QString escaped = field;
+                    escaped.replace("\"", "\"\"");
+                    return "\"" + escaped + "\"";
+                }
+                return field;
+            };
+            
+            // Fixed CSV output - properly format and escape all fields
             out << QString("%1,%2,%3,%4,%5,%6,%7\n")
                    .arg(id)
-                   .arg(project)
-                   .arg(activity)
-                   .arg(startStr)
-                   .arg(endStr)
-                   .arg(durationStr)
+                   .arg(escapeCSV(project))
+                   .arg(escapeCSV(activity))
+                   .arg(escapeCSV(startStr))
+                   .arg(escapeCSV(endStr))
+                   .arg(escapeCSV(durationStr))
                    .arg(decimalHours, 0, 'f', 1);
+        }
+        
+        // Also export detailed tracking data
+        exportDetailedTrackingToCsv();
+    }
+    
+    void exportDetailedTrackingToCsv() {
+        QString detailedCsvPath = csvPath;
+        detailedCsvPath.replace(".csv", "_detailed.csv");
+        
+        QFile file(detailedCsvPath);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) return;
+        
+        QTextStream out(&file);
+        out << "Time Entry ID,Project,Activity,Timestamp,Active App,Document/URL,Idle Seconds,Is Locked\n";
+        
+        // Properly escape CSV fields that contain commas, quotes, or newlines
+        auto escapeCSV = [](const QString& field) {
+            if (field.contains(',') || field.contains('"') || field.contains('\n')) {
+                QString escaped = field;
+                escaped.replace("\"", "\"\"");
+                return "\"" + escaped + "\"";
+            }
+            return field;
+        };
+        
+        QSqlQuery query(R"(
+            SELECT dt.time_entry_id, te.project, te.activity, dt.timestamp, 
+                   dt.active_app, dt.document_url, dt.idle_seconds, dt.is_locked
+            FROM detailed_tracking dt
+            JOIN time_entries te ON dt.time_entry_id = te.id
+            ORDER BY dt.timestamp
+        )");
+        
+        while (query.next()) {
+            qint64 timeEntryId = query.value(0).toLongLong();
+            QString project = query.value(1).toString();
+            QString activity = query.value(2).toString();
+            qint64 timestamp = query.value(3).toLongLong();
+            QString activeApp = query.value(4).toString();
+            QString documentUrl = query.value(5).toString();
+            int idleSeconds = query.value(6).toInt();
+            bool isLocked = query.value(7).toBool();
+            
+            QDateTime dt = QDateTime::fromSecsSinceEpoch(timestamp);
+            QString timestampStr = dt.toString("yyyy-MM-dd hh:mm:ss");
+            
+            out << QString("%1,%2,%3,%4,%5,%6,%7,%8\n")
+                   .arg(timeEntryId)
+                   .arg(escapeCSV(project))
+                   .arg(escapeCSV(activity))
+                   .arg(escapeCSV(timestampStr))
+                   .arg(escapeCSV(activeApp))
+                   .arg(escapeCSV(documentUrl))
+                   .arg(idleSeconds)
+                   .arg(isLocked ? "Yes" : "No");
         }
     }
     
@@ -1031,12 +1523,16 @@ public:
 private:
     
     bool isTracking;
+    bool isPaused;
     QString currentProject;
     QString currentActivity;
     QDateTime startTime;
+    QDateTime pauseStartTime;
+    qint64 totalPausedSeconds;
     QString csvPath;
     QString dataFolder;
     qint64 lastKnownSessionStart;
+    QTimer* idleTimer;
     
     QSqlDatabase db;
     QMediaPlayer* player;
@@ -1044,7 +1540,9 @@ private:
     QTimer* chimeTimer;
     QTimer* syncTimer;
     QTimer* displayTimer;
+    QTimer* detailedTrackingTimer;
     StateManager* stateManager;
+    qint64 currentTimeEntryId;
 };
 
 class DraggableHandle : public QWidget {

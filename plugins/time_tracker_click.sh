@@ -157,29 +157,91 @@ else
     sqlite3 "$DB_FILE" "ALTER TABLE time_entries ADD COLUMN activity TEXT;" 2>/dev/null || true
 fi
 
+# Create detailed tracking table if it doesn't exist
+sqlite3 "$DB_FILE" "CREATE TABLE IF NOT EXISTS detailed_tracking (
+    id INTEGER PRIMARY KEY,
+    time_entry_id INTEGER,
+    timestamp INTEGER,
+    active_app TEXT,
+    document_url TEXT,
+    idle_seconds INTEGER DEFAULT 0,
+    is_locked INTEGER DEFAULT 0,
+    FOREIGN KEY (time_entry_id) REFERENCES time_entries(id)
+);" 2>/dev/null || true
+
+# Create pause periods table if it doesn't exist
+sqlite3 "$DB_FILE" "CREATE TABLE IF NOT EXISTS pause_periods (
+    id INTEGER PRIMARY KEY,
+    time_entry_id INTEGER,
+    pause_start INTEGER,
+    pause_end INTEGER,
+    reason TEXT,
+    FOREIGN KEY (time_entry_id) REFERENCES time_entries(id)
+);" 2>/dev/null || true
+
 # Get current project
 current_project=$(sqlite3 "$DB_FILE" "SELECT project FROM time_entries WHERE end_time IS NULL ORDER BY start_time DESC LIMIT 1;")
 echo "Current project: '$current_project'" >> /tmp/time_tracker_click_debug.log
 
 if [ -n "$current_project" ]; then
-    # Show tracking options menu
-    echo "Showing tracking options menu" >> /tmp/time_tracker_click_debug.log
+    # Check if currently paused
+    current_time_entry_id=$(sqlite3 "$DB_FILE" "SELECT id FROM time_entries WHERE end_time IS NULL ORDER BY start_time DESC LIMIT 1;")
+    is_paused=$(sqlite3 "$DB_FILE" "SELECT COUNT(*) FROM pause_periods WHERE time_entry_id = $current_time_entry_id AND pause_end IS NULL;")
     
-    tracking_action=$(osascript -e "
-    try
-        tell application \"System Events\"
-            activate
-            set actionChoices to {\"Change Activity\", \"Change Project\", \"Stop Tracking\"}
-            set selectedAction to choose from list actionChoices with prompt \"Select action:\" default items {\"Stop Tracking\"} with title \"Tracking Options\" OK button name \"OK\" cancel button name \"Cancel\"
-            if selectedAction is false then
-                return \"\"
-            end if
-            return item 1 of selectedAction
-        end tell
-    on error
-        return \"\"
-    end try
-    ")
+    if [ "$is_paused" -gt 0 ]; then
+        # Currently paused - resume tracking directly
+        echo "Resuming tracking directly" >> /tmp/time_tracker_click_debug.log
+        sqlite3 "$DB_FILE" "UPDATE pause_periods SET pause_end = strftime('%s', 'now') WHERE time_entry_id = $current_time_entry_id AND pause_end IS NULL;"
+        
+        # Restart chime process when resuming
+        echo "Restarting chime process for resume" >> /tmp/time_tracker_click_debug.log
+        start_chime_process
+        
+        play_chime
+    else
+        # Currently tracking - auto-pause and show menu
+        echo "Auto-pausing tracking and showing menu" >> /tmp/time_tracker_click_debug.log
+        sqlite3 "$DB_FILE" "INSERT INTO pause_periods (time_entry_id, pause_start, reason) VALUES ($current_time_entry_id, strftime('%s', 'now'), 'Manual pause');"
+        
+        # Stop chime process when pausing
+        if [ -f "$CHIME_PID_FILE" ]; then
+            old_pid=$(cat "$CHIME_PID_FILE")
+            if kill -0 "$old_pid" 2>/dev/null; then
+                kill "$old_pid"
+                echo "Stopped chime process for pause" >> /tmp/time_tracker_click_debug.log
+            fi
+            rm -f "$CHIME_PID_FILE"
+        fi
+        
+        # Show tracking options menu (without pause option)
+        tracking_action=$(osascript -e "
+        try
+            tell application \"System Events\"
+                activate
+                set actionChoices to {\"Change Activity\", \"Change Project\", \"Stop Tracking\"}
+                set selectedAction to choose from list actionChoices with prompt \"Select action:\" default items {\"Stop Tracking\"} with title \"Tracking Options\" OK button name \"OK\" cancel button name \"Cancel\"
+                if selectedAction is false then
+                    return \"\"
+                end if
+                return item 1 of selectedAction
+            end tell
+        on error
+            return \"\"
+        end try
+        ")
+        
+        echo "Selected tracking action: '$tracking_action'" >> /tmp/time_tracker_click_debug.log
+        
+        if [ -z "$tracking_action" ]; then
+            # User cancelled - resume tracking
+            echo "Menu cancelled - resuming tracking" >> /tmp/time_tracker_click_debug.log
+            sqlite3 "$DB_FILE" "UPDATE pause_periods SET pause_end = strftime('%s', 'now') WHERE time_entry_id = $current_time_entry_id AND pause_end IS NULL;"
+            
+            # Restart chime process when resuming
+            echo "Restarting chime process after cancel" >> /tmp/time_tracker_click_debug.log
+            start_chime_process
+        fi
+    fi
     
     echo "Selected tracking action: '$tracking_action'" >> /tmp/time_tracker_click_debug.log
     
@@ -269,6 +331,14 @@ if [ -n "$current_project" ]; then
             sqlite3 "$DB_FILE" "UPDATE time_entries SET activity = '$selected_activity' WHERE end_time IS NULL;"
             # Regenerate CSV after activity change
             export_csv
+            
+            # Resume tracking after changing activity
+            echo "Resuming tracking after activity change" >> /tmp/time_tracker_click_debug.log
+            sqlite3 "$DB_FILE" "UPDATE pause_periods SET pause_end = strftime('%s', 'now') WHERE time_entry_id = $current_time_entry_id AND pause_end IS NULL;"
+            
+            # Restart chime process
+            echo "Restarting chime process after activity change" >> /tmp/time_tracker_click_debug.log
+            start_chime_process
         fi
         
     elif [ "$tracking_action" = "Change Project" ]; then
@@ -312,6 +382,33 @@ if [ -n "$current_project" ]; then
                         return \"\"
                     end if
                     return newProject
+                end if
+                
+                -- Handle project management
+                if chosenProject is \"[Manage Projects]\" then
+                    repeat
+                        -- Show projects for management
+                        set projectsToManage to choose from list projectArray with prompt \"Select projects to manage:\" with title \"Manage Projects\" with multiple selections allowed OK button name \"Manage\" cancel button name \"Close\"
+                        if projectsToManage is false then
+                            -- User clicked Close - return to project selection
+                            return \"RETURN_TO_SELECTION\"
+                        end if
+                        
+                        if projectsToManage is not false then
+                            set confirmDialog to display dialog \"Remove selected projects from future selections?\" & return & return & \"Choose action:\" buttons {\"Cancel\", \"Remove from list only\", \"Delete all time entries\"} default button \"Remove from list only\" with title \"Confirm Action\"
+                            set buttonChoice to button returned of confirmDialog
+                            if buttonChoice is \"Remove from list only\" then
+                                repeat with proj in projectsToManage
+                                    return \"HIDE:\" & proj
+                                end repeat
+                            else if buttonChoice is \"Delete all time entries\" then
+                                repeat with proj in projectsToManage
+                                    return \"DELETE:\" & proj
+                                end repeat
+                            end if
+                            -- If Cancel was clicked, continue the loop to show manage dialog again
+                        end if
+                    end repeat
                 end if
                 
                 return chosenProject
@@ -406,6 +503,14 @@ if [ -n "$current_project" ]; then
                 sqlite3 "$DB_FILE" "UPDATE time_entries SET project = '$selected_project', activity = '$selected_activity' WHERE end_time IS NULL;"
                 # Regenerate CSV after project and activity change
                 export_csv
+                
+                # Resume tracking after changing project
+                echo "Resuming tracking after project change" >> /tmp/time_tracker_click_debug.log
+                sqlite3 "$DB_FILE" "UPDATE pause_periods SET pause_end = strftime('%s', 'now') WHERE time_entry_id = $current_time_entry_id AND pause_end IS NULL;"
+                
+                # Restart chime process
+                echo "Restarting chime process after project change" >> /tmp/time_tracker_click_debug.log
+                start_chime_process
             fi
         fi
         
